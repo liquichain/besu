@@ -109,6 +109,9 @@ public interface GenesisConfigOptions {
    */
   QbftConfigOptions getQbftConfigOptions();
 
+  CustomIbftConfigOptions getCustomIbftConfigOptions();
+
+
   /**
    * Gets discovery options.
    *
