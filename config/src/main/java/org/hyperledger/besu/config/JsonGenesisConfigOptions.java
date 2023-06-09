@@ -160,6 +160,13 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
+  public CustomIbftConfigOptions getCustomIbftConfigOptions() {
+    return JsonUtil.getObjectNode(configRoot, IBFT2_CONFIG_KEY)
+        .map(JsonCustomIbftConfigOptions::new)
+        .orElse(JsonCustomIbftConfigOptions.DEFAULT);
+  }
+
+  @Override
   public DiscoveryOptions getDiscoveryOptions() {
     return JsonUtil.getObjectNode(configRoot, DISCOVERY_CONFIG_KEY)
         .map(DiscoveryOptions::new)
