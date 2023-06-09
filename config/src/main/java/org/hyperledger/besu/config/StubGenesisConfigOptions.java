@@ -73,6 +73,8 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions, Cloneable
   private Optional<String> ecCurve = Optional.empty();
   private QbftConfigOptions qbftConfigOptions = JsonQbftConfigOptions.DEFAULT;
   private BftConfigOptions bftConfigOptions = JsonBftConfigOptions.DEFAULT;
+  private CustomIbftConfigOptions customIbftConfigOptions = JsonCustomIbftConfigOptions.DEFAULT;
+
   private TransitionsConfigOptions transitions = TransitionsConfigOptions.DEFAULT;
   private static final DiscoveryOptions DISCOVERY_OPTIONS = DiscoveryOptions.DEFAULT;
   private boolean zeroBaseFee = false;
@@ -139,6 +141,11 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions, Cloneable
   @Override
   public QbftConfigOptions getQbftConfigOptions() {
     return qbftConfigOptions;
+  }
+
+  @Override
+  public CustomIbftConfigOptions getCustomIbftConfigOptions() {
+    return customIbftConfigOptions;
   }
 
   @Override
