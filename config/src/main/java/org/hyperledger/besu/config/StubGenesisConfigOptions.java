@@ -114,6 +114,9 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions, Cloneable
   }
 
   @Override
+  public boolean isCustomIbft() { return false; }
+
+  @Override
   public boolean isQbft() {
     return false;
   }

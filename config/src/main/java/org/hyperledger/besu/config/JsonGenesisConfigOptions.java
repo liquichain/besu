@@ -41,6 +41,7 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   private static final String ETHASH_CONFIG_KEY = "ethash";
   private static final String IBFT_LEGACY_CONFIG_KEY = "ibft";
   private static final String IBFT2_CONFIG_KEY = "ibft2";
+  private static final String CUSTOM_IBFT_CONFIG_KEY = "customibft";
   private static final String QBFT_CONFIG_KEY = "qbft";
   private static final String CLIQUE_CONFIG_KEY = "clique";
   private static final String EC_CURVE_CONFIG_KEY = "eccurve";
@@ -140,6 +141,9 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   public boolean isIbft2() {
     return configRoot.has(IBFT2_CONFIG_KEY);
   }
+
+  @Override
+  public boolean isCustomIbft() { return configRoot.has(CUSTOM_IBFT_CONFIG_KEY); }
 
   @Override
   public boolean isQbft() {
