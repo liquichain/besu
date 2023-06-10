@@ -51,6 +51,12 @@ public interface GenesisConfigOptions {
   boolean isIbft2();
 
   /**
+   * Is custom ibft boolean.
+   *
+   * @return the boolean
+   */
+  boolean isCustomIbft();
+  /**
    * Is qbft boolean.
    *
    * @return the boolean

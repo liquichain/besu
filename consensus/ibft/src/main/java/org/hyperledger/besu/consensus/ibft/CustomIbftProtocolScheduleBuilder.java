@@ -34,7 +34,7 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
       final boolean isRevertReasonEnabled,
       final BftExtraDataCodec bftExtraDataCodec,
       final EvmConfiguration evmConfiguration) {
-    return new IbftProtocolScheduleBuilder()
+    return new CustomIbftProtocolScheduleBuilder()
         .createProtocolSchedule(
             config,
             forksSchedule,
