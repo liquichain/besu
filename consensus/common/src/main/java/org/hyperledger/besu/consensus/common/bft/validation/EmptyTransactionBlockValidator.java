@@ -15,28 +15,32 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EmptyTransactionBlockValidator extends MainnetBlockValidator {
-    private static final Logger LOG =
-            LoggerFactory.getLogger(EmptyTransactionBlockValidator.class);
+  private static final Logger LOG =
+      LoggerFactory.getLogger(EmptyTransactionBlockValidator.class);
 
-    public EmptyTransactionBlockValidator(BlockHeaderValidator blockHeaderValidator, BlockBodyValidator blockBodyValidator, BlockProcessor blockProcessor, BadBlockManager badBlockManager) {
-        super(blockHeaderValidator, blockBodyValidator, blockProcessor, badBlockManager);
+  public EmptyTransactionBlockValidator(final BlockHeaderValidator blockHeaderValidator,
+                                        final BlockBodyValidator blockBodyValidator,
+                                        final BlockProcessor blockProcessor,
+                                        final BadBlockManager badBlockManager) {
+    super(blockHeaderValidator, blockBodyValidator, blockProcessor, badBlockManager);
+  }
+
+  @Override
+  public BlockProcessingResult validateAndProcessBlock(
+      final ProtocolContext context,
+      final Block block,
+      final HeaderValidationMode headerValidationMode,
+      final HeaderValidationMode ommerValidationMode,
+      final boolean shouldPersist,
+      final boolean shouldRecordBadBlock) {
+
+    final BlockBody blockBody = block.getBody();
+
+    if (blockBody.getTransactions().isEmpty()) {
+      LOG.info("Block validation", "Block has no transaction");
+      return new BlockProcessingResult("Block has no transaction");
     }
 
-    @Override
-    public BlockProcessingResult validateAndProcessBlock(
-            final ProtocolContext context,
-            final Block block,
-            final HeaderValidationMode headerValidationMode,
-            final HeaderValidationMode ommerValidationMode,
-            final boolean shouldPersist,
-            final boolean shouldRecordBadBlock) {
-
-        final BlockBody blockBody = block.getBody();
-
-        if (blockBody.getTransactions().isEmpty()) {
-            return new BlockProcessingResult("Block has no transaction");
-        }
-
-        return super.validateAndProcessBlock(context, block, headerValidationMode, ommerValidationMode, shouldPersist, shouldRecordBadBlock);
-    }
+    return super.validateAndProcessBlock(context, block, headerValidationMode, ommerValidationMode, shouldPersist, shouldRecordBadBlock);
+  }
 }

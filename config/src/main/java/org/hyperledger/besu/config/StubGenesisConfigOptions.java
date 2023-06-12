@@ -881,6 +881,11 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions, Cloneable
     return this;
   }
 
+  public StubGenesisConfigOptions customIbftConfigOptions(final CustomIbftConfigOptions customIbftConfigOptions) {
+    this.customIbftConfigOptions = customIbftConfigOptions;
+    return this;
+  }
+
   /**
    * Transitions stub genesis config options.
    *
