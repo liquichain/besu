@@ -1,8 +1,8 @@
 package org.hyperledger.besu.config;
 
-import com.fasterxml.jackson.databind.node.*;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import java.util.*;
+import java.util.List;
 
 public class JsonCustomIbftConfigOptions extends JsonBftConfigOptions implements CustomIbftConfigOptions {
   public static final JsonCustomIbftConfigOptions DEFAULT =
