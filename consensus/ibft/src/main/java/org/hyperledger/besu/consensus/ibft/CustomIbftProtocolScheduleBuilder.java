@@ -1,17 +1,29 @@
 package org.hyperledger.besu.consensus.ibft;
 
-import org.hyperledger.besu.config.*;
-import org.hyperledger.besu.consensus.common.*;
-import org.hyperledger.besu.consensus.common.bft.*;
-import org.hyperledger.besu.consensus.common.bft.validation.*;
-import org.hyperledger.besu.datatypes.*;
-import org.hyperledger.besu.ethereum.core.*;
-import org.hyperledger.besu.ethereum.mainnet.*;
-import org.hyperledger.besu.evm.internal.*;
+import org.hyperledger.besu.config.BftConfigOptions;
+import org.hyperledger.besu.config.GenesisConfigOptions;
+import org.hyperledger.besu.consensus.common.ForksSchedule;
+import org.hyperledger.besu.consensus.common.bft.BftBlockHeaderFunctions;
+import org.hyperledger.besu.consensus.common.bft.BftExtraDataCodec;
+import org.hyperledger.besu.consensus.common.bft.BftProtocolSchedule;
+import org.hyperledger.besu.consensus.common.bft.validation.EmptyTransactionBlockValidator;
+import org.hyperledger.besu.consensus.common.bft.validation.IBtfTransactionValidator;
+import org.hyperledger.besu.datatypes.Wei;
+import org.hyperledger.besu.ethereum.core.PrivacyParameters;
+import org.hyperledger.besu.ethereum.mainnet.DefaultProtocolSchedule;
+import org.hyperledger.besu.ethereum.mainnet.MainnetBlockBodyValidator;
+import org.hyperledger.besu.ethereum.mainnet.MainnetBlockImporter;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolScheduleBuilder;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecAdapters;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecBuilder;
+import org.hyperledger.besu.evm.internal.EvmConfiguration;
 
-import java.math.*;
-import java.util.*;
-import java.util.function.*;
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuilder {
   private static final BigInteger DEFAULT_CHAIN_ID = BigInteger.ONE;
@@ -68,7 +80,12 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
   }
 
   @Override
-  public BftProtocolSchedule createProtocolSchedule(GenesisConfigOptions config, ForksSchedule<? extends BftConfigOptions> forksSchedule, PrivacyParameters privacyParameters, boolean isRevertReasonEnabled, BftExtraDataCodec bftExtraDataCodec, EvmConfiguration evmConfiguration) {
+  public BftProtocolSchedule createProtocolSchedule(final GenesisConfigOptions config,
+                                                    final ForksSchedule<? extends BftConfigOptions> forksSchedule,
+                                                    final PrivacyParameters privacyParameters,
+                                                    final boolean isRevertReasonEnabled,
+                                                    final BftExtraDataCodec bftExtraDataCodec,
+                                                    final EvmConfiguration evmConfiguration) {
     final Map<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> specMap = new HashMap<>();
 
     forksSchedule
