@@ -7,7 +7,7 @@ import org.hyperledger.besu.consensus.common.bft.BftBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.common.bft.BftExtraDataCodec;
 import org.hyperledger.besu.consensus.common.bft.BftProtocolSchedule;
 import org.hyperledger.besu.consensus.common.bft.validation.EmptyTransactionBlockValidator;
-import org.hyperledger.besu.consensus.common.bft.validation.IBtfTransactionValidator;
+import org.hyperledger.besu.consensus.common.bft.validation.IbftTransactionValidator;
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.mainnet.DefaultProtocolSchedule;
@@ -21,6 +21,7 @@ import org.hyperledger.besu.evm.internal.EvmConfiguration;
 
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -123,6 +124,8 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
       throw new IllegalArgumentException("Bft Block reward in config cannot be negative");
     }
 
+    List<String> allowList = config.getCustomIbftConfigOptions().getAllowListContractAddresses();
+
     return builder
         .blockHeaderValidatorBuilder(
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
@@ -130,8 +133,8 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
         .transactionValidatorBuilder(
             (gasCalculator, gasLimitCalculator) ->
-                new IBtfTransactionValidator(Optional.of(config.getCustomIbftConfigOptions().getAllowListContractAddresses()),
-                    gasCalculator, gasLimitCalculator, true, Optional.empty()))
+                new IbftTransactionValidator(Optional.of(allowList),
+                    gasCalculator, gasLimitCalculator, true, config.getChainId()))
         .blockBodyValidatorBuilder(MainnetBlockBodyValidator::new)
         .blockValidatorBuilder(EmptyTransactionBlockValidator::new)
         .blockImporterBuilder(MainnetBlockImporter::new)
