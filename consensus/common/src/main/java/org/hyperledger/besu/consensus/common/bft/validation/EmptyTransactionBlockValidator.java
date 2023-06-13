@@ -23,6 +23,7 @@ public class EmptyTransactionBlockValidator extends MainnetBlockValidator {
                                         final BlockProcessor blockProcessor,
                                         final BadBlockManager badBlockManager) {
     super(blockHeaderValidator, blockBodyValidator, blockProcessor, badBlockManager);
+    LOG.info("CreateEmptyTransaction");
   }
 
   @Override
@@ -35,6 +36,7 @@ public class EmptyTransactionBlockValidator extends MainnetBlockValidator {
       final boolean shouldRecordBadBlock) {
 
     final BlockBody blockBody = block.getBody();
+    LOG.info("validateBlock" + blockBody.toString());
 
     if (blockBody.getTransactions().isEmpty()) {
       LOG.info("Block validation", "Block has no transaction");
