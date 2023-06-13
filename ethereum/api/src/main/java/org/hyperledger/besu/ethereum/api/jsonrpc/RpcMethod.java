@@ -179,8 +179,8 @@ public enum RpcMethod {
   TX_POOL_BESU_PENDING_TRANSACTIONS("txpool_besuPendingTransactions"),
   WEB3_CLIENT_VERSION("web3_clientVersion"),
   WEB3_SHA3("web3_sha3"),
-  PLUGINS_RELOAD_CONFIG("plugins_reloadPluginConfig");
-
+  PLUGINS_RELOAD_CONFIG("plugins_reloadPluginConfig"),
+  IBFT_ADD_CONTRACT_ADDRESS("ibft_addContractAddress");
   private final String methodName;
 
   private static final Collection<String> allMethodNames;

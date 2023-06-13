@@ -8,11 +8,13 @@ import org.hyperledger.besu.consensus.common.bft.BftExtraDataCodec;
 import org.hyperledger.besu.consensus.common.bft.BftProtocolSchedule;
 import org.hyperledger.besu.consensus.common.bft.validation.EmptyTransactionBlockValidator;
 import org.hyperledger.besu.consensus.common.bft.validation.IbftTransactionValidator;
+import org.hyperledger.besu.consensus.common.bft.validation.PrivateIbftTransactionValidator;
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.mainnet.DefaultProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockBodyValidator;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockImporter;
+import org.hyperledger.besu.ethereum.mainnet.MainnetProtocolSpecs;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolScheduleBuilder;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecAdapters;
@@ -131,12 +133,13 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
         .ommerHeaderValidatorBuilder(
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
+//        .privateTransactionValidatorBuilder(() -> new PrivateIbftTransactionValidator(config.getChainId(), Optional.of(allowList)))
         .transactionValidatorBuilder(
             (gasCalculator, gasLimitCalculator) ->
                 new IbftTransactionValidator(Optional.of(allowList),
                     gasCalculator, gasLimitCalculator, true, config.getChainId()))
         .blockBodyValidatorBuilder(MainnetBlockBodyValidator::new)
-        .blockValidatorBuilder(EmptyTransactionBlockValidator::new)
+        .blockValidatorBuilder(MainnetProtocolSpecs.blockValidatorBuilder())
         .blockImporterBuilder(MainnetBlockImporter::new)
         .difficultyCalculator((time, parent, protocolContext) -> BigInteger.ONE)
         .skipZeroBlockRewards(true)
