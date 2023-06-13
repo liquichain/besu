@@ -172,7 +172,7 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
 
   @Override
   public CustomIbftConfigOptions getCustomIbftConfigOptions() {
-    return JsonUtil.getObjectNode(configRoot, IBFT2_CONFIG_KEY)
+    return JsonUtil.getObjectNode(configRoot, CUSTOM_IBFT_CONFIG_KEY)
         .map(JsonCustomIbftConfigOptions::new)
         .orElse(JsonCustomIbftConfigOptions.DEFAULT);
   }
