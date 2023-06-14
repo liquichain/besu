@@ -1,6 +1,7 @@
 package org.hyperledger.besu.consensus.ibft;
 
 import org.hyperledger.besu.config.BftConfigOptions;
+import org.hyperledger.besu.config.CustomIbftConfigOptions;
 import org.hyperledger.besu.config.GenesisConfigOptions;
 import org.hyperledger.besu.consensus.common.ForksSchedule;
 import org.hyperledger.besu.consensus.common.bft.BftBlockHeaderFunctions;
@@ -11,6 +12,7 @@ import org.hyperledger.besu.consensus.common.bft.validation.IbftTransactionValid
 import org.hyperledger.besu.consensus.common.bft.validation.PrivateIbftTransactionValidator;
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
+import org.hyperledger.besu.ethereum.core.feemarket.CoinbaseFeePriceCalculator;
 import org.hyperledger.besu.ethereum.mainnet.DefaultProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockBodyValidator;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockImporter;
@@ -19,6 +21,8 @@ import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolScheduleBuilder;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecAdapters;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecBuilder;
+import org.hyperledger.besu.ethereum.mainnet.feemarket.FeeMarket;
+import org.hyperledger.besu.evm.frame.MessageFrame;
 import org.hyperledger.besu.evm.internal.EvmConfiguration;
 
 import java.math.BigInteger;
@@ -126,18 +130,31 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
       throw new IllegalArgumentException("Bft Block reward in config cannot be negative");
     }
 
-    List<String> allowList = config.getCustomIbftConfigOptions().getAllowListContractAddresses();
+    CustomIbftConfigOptions ibftConfig = config.getCustomIbftConfigOptions();
+    final int stackSizeLimit = config.getContractSizeLimit().orElse(MessageFrame.DEFAULT_MAX_STACK_SIZE);
 
     return builder
         .blockHeaderValidatorBuilder(
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
         .ommerHeaderValidatorBuilder(
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
-//        .privateTransactionValidatorBuilder(() -> new PrivateIbftTransactionValidator(config.getChainId(), Optional.of(allowList)))
-        .transactionValidatorBuilder(
-            (gasCalculator, gasLimitCalculator) ->
-                new IbftTransactionValidator(Optional.of(allowList),
-                    gasCalculator, gasLimitCalculator, true, config.getChainId()))
+        .transactionProcessorBuilder((gasCalculator,
+                                      transactionValidator,
+                                      contractCreationProcessor,
+                                      messageCallProcessor) ->
+            new CustomIbftTransactionProcessor(
+                ibftConfig,
+                gasCalculator,
+                new IbftTransactionValidator(),
+                transactionValidator,
+                contractCreationProcessor,
+                messageCallProcessor,
+                false,
+                false,
+                stackSizeLimit,
+                FeeMarket.legacy(),
+                CoinbaseFeePriceCalculator.eip1559()))
+
         .blockBodyValidatorBuilder(MainnetBlockBodyValidator::new)
         .blockValidatorBuilder(MainnetProtocolSpecs.blockValidatorBuilder())
         .blockImporterBuilder(MainnetBlockImporter::new)
