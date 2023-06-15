@@ -133,12 +133,11 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
         .ommerHeaderValidatorBuilder(
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
-        .transactionValidatorBuilder((gasCalculator, gasLimitCalculator) -> new IbftTransactionValidator(
-            validator,
-            gasCalculator,
-            gasLimitCalculator,
-            true,
-            config.getChainId()))
+        .transactionValidatorBuilder(
+            (gasCalculator, gasLimitCalculator) ->
+                new IbftTransactionValidator(
+                    validator,
+                    gasCalculator, gasLimitCalculator, false, config.getChainId()))
         .blockBodyValidatorBuilder(MainnetBlockBodyValidator::new)
         .blockValidatorBuilder(MainnetProtocolSpecs.blockValidatorBuilder())
         .blockImporterBuilder(MainnetBlockImporter::new)
