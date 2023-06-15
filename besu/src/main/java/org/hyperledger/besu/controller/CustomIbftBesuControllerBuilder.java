@@ -43,6 +43,7 @@ import org.hyperledger.besu.consensus.common.bft.statemachine.BftFinalState;
 import org.hyperledger.besu.consensus.common.bft.statemachine.FutureMessageBuffer;
 import org.hyperledger.besu.consensus.common.validator.ValidatorProvider;
 import org.hyperledger.besu.consensus.common.validator.blockbased.BlockValidatorProvider;
+import org.hyperledger.besu.consensus.ibft.CustomIbftContext;
 import org.hyperledger.besu.consensus.ibft.CustomIbftProtocolScheduleBuilder;
 import org.hyperledger.besu.consensus.ibft.IbftExtraDataCodec;
 import org.hyperledger.besu.consensus.ibft.IbftForksSchedulesFactory;
@@ -54,6 +55,7 @@ import org.hyperledger.besu.consensus.ibft.protocol.IbftSubProtocol;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftController;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftRoundFactory;
+import org.hyperledger.besu.consensus.ibft.validation.CustomIbftValidator;
 import org.hyperledger.besu.consensus.ibft.validation.MessageValidatorFactory;
 import org.hyperledger.besu.datatypes.Address;
 import org.hyperledger.besu.ethereum.ProtocolContext;
@@ -87,7 +89,9 @@ import com.google.common.base.Suppliers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** The Custom Ibft besu controller builder. */
+/**
+ * The Custom Ibft besu controller builder.
+ */
 public class CustomIbftBesuControllerBuilder extends BftBesuControllerBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(IbftBesuControllerBuilder.class);
@@ -96,6 +100,7 @@ public class CustomIbftBesuControllerBuilder extends BftBesuControllerBuilder {
   private ForksSchedule<BftConfigOptions> forksSchedule;
   private ValidatorPeers peers;
 
+  private CustomIbftValidator validator;
   @Override
   protected Supplier<BftExtraDataCodec> bftExtraDataCodec() {
     return Suppliers.memoize(IbftExtraDataCodec::new);
@@ -106,6 +111,7 @@ public class CustomIbftBesuControllerBuilder extends BftBesuControllerBuilder {
     customIbftConfig = configOptionsSupplier.get().getCustomIbftConfigOptions();
     bftEventQueue = new BftEventQueue(customIbftConfig.getMessageQueueLimit());
     forksSchedule = IbftForksSchedulesFactory.create(configOptionsSupplier.get());
+    validator = new CustomIbftValidator(customIbftConfig);
   }
 
   @Override
@@ -255,7 +261,8 @@ public class CustomIbftBesuControllerBuilder extends BftBesuControllerBuilder {
         privacyParameters,
         isRevertReasonEnabled,
         bftExtraDataCodec().get(),
-        evmConfiguration);
+        evmConfiguration,
+        validator);
   }
 
   @Override
@@ -273,13 +280,14 @@ public class CustomIbftBesuControllerBuilder extends BftBesuControllerBuilder {
       final WorldStateArchive worldStateArchive,
       final ProtocolSchedule protocolSchedule) {
     final GenesisConfigOptions configOptions = configOptionsSupplier.get();
-    final BftConfigOptions ibftConfig = configOptions.getBftConfigOptions();
+    final CustomIbftConfigOptions ibftConfig = configOptions.getCustomIbftConfigOptions();
     final EpochManager epochManager = new EpochManager(ibftConfig.getEpochLength());
 
     final BftValidatorOverrides validatorOverrides =
         convertIbftForks(configOptions.getTransitions().getIbftForks());
 
-    return new BftContext(
+    return new CustomIbftContext(
+        validator,
         BlockValidatorProvider.forkingValidatorProvider(
             blockchain, epochManager, bftBlockInterface().get(), validatorOverrides),
         epochManager,

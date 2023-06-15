@@ -17,10 +17,11 @@ public class JsonCustomIbftConfigOptions extends JsonBftConfigOptions implements
   public static final JsonCustomIbftConfigOptions DEFAULT =
       new JsonCustomIbftConfigOptions(JsonUtil.createEmptyObjectNode());
 
-//  private static final Logger LOG =
+  //  private static final Logger LOG =
 //      LoggerFactory.getLogger(JsonCustomIbftConfigOptions.class);
   private static final String CONTRACT_ADDRESSES_KEY = "contractaddresses";
-
+  private final ObjectMapper mapper;
+  private List<String> allowList;
 
   /**
    * Instantiates a new Json bft config options.
@@ -29,16 +30,13 @@ public class JsonCustomIbftConfigOptions extends JsonBftConfigOptions implements
    */
   public JsonCustomIbftConfigOptions(final ObjectNode bftConfigRoot) {
     super(bftConfigRoot);
+    mapper = JsonUtil.getObjectMapper();
   }
 
   @Override
   public List<String> getAllowListContractAddresses() {
 
-
-    ObjectMapper mapper = JsonUtil.getObjectMapper();
-
     ArrayNode node = JsonUtil.getArrayNode(this.bftConfigRoot, CONTRACT_ADDRESSES_KEY).get();
-    List<String> allowList = null;
     try {
       allowList = mapper.treeToValue(node, mapper.getTypeFactory().constructCollectionType(List.class, String.class));
     } catch (JsonProcessingException e) {

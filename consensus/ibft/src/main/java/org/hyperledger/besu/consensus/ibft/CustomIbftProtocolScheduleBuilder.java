@@ -1,16 +1,14 @@
 package org.hyperledger.besu.consensus.ibft;
 
 import org.hyperledger.besu.config.BftConfigOptions;
-import org.hyperledger.besu.config.CustomIbftConfigOptions;
 import org.hyperledger.besu.config.GenesisConfigOptions;
 import org.hyperledger.besu.consensus.common.ForksSchedule;
 import org.hyperledger.besu.consensus.common.bft.BftBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.common.bft.BftExtraDataCodec;
 import org.hyperledger.besu.consensus.common.bft.BftProtocolSchedule;
-import org.hyperledger.besu.consensus.common.bft.validation.IbftTransactionValidator;
+import org.hyperledger.besu.consensus.ibft.validation.CustomIbftValidator;
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
-import org.hyperledger.besu.ethereum.core.feemarket.CoinbaseFeePriceCalculator;
 import org.hyperledger.besu.ethereum.mainnet.DefaultProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockBodyValidator;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockImporter;
@@ -19,8 +17,6 @@ import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolScheduleBuilder;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecAdapters;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecBuilder;
-import org.hyperledger.besu.ethereum.mainnet.feemarket.FeeMarket;
-import org.hyperledger.besu.evm.frame.MessageFrame;
 import org.hyperledger.besu.evm.internal.EvmConfiguration;
 
 import java.math.BigInteger;
@@ -48,7 +44,8 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
       final PrivacyParameters privacyParameters,
       final boolean isRevertReasonEnabled,
       final BftExtraDataCodec bftExtraDataCodec,
-      final EvmConfiguration evmConfiguration) {
+      final EvmConfiguration evmConfiguration,
+      final CustomIbftValidator validator) {
     return new CustomIbftProtocolScheduleBuilder()
         .createProtocolSchedule(
             config,
@@ -56,7 +53,8 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
             privacyParameters,
             isRevertReasonEnabled,
             bftExtraDataCodec,
-            evmConfiguration);
+            evmConfiguration,
+            validator);
   }
 
   /**
@@ -72,23 +70,26 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
       final GenesisConfigOptions config,
       final ForksSchedule<BftConfigOptions> forksSchedule,
       final BftExtraDataCodec bftExtraDataCodec,
-      final EvmConfiguration evmConfiguration) {
+      final EvmConfiguration evmConfiguration,
+      final CustomIbftValidator validator
+  ) {
     return create(
         config,
         forksSchedule,
         PrivacyParameters.DEFAULT,
         false,
         bftExtraDataCodec,
-        evmConfiguration);
+        evmConfiguration,
+        validator);
   }
 
-  @Override
   public BftProtocolSchedule createProtocolSchedule(final GenesisConfigOptions config,
                                                     final ForksSchedule<? extends BftConfigOptions> forksSchedule,
                                                     final PrivacyParameters privacyParameters,
                                                     final boolean isRevertReasonEnabled,
                                                     final BftExtraDataCodec bftExtraDataCodec,
-                                                    final EvmConfiguration evmConfiguration) {
+                                                    final EvmConfiguration evmConfiguration,
+                                                    final CustomIbftValidator validator) {
     final Map<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> specMap = new HashMap<>();
 
     forksSchedule
@@ -97,7 +98,7 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
             forkSpec ->
                 specMap.put(
                     forkSpec.getBlock(),
-                    builder -> applyBftChanges(config, builder, forkSpec.getValue(), bftExtraDataCodec)));
+                    builder -> applyBftChanges(config, builder, forkSpec.getValue(), bftExtraDataCodec, validator)));
 
     final ProtocolSpecAdapters specAdapters = new ProtocolSpecAdapters(specMap);
 
@@ -118,7 +119,8 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
       final GenesisConfigOptions config,
       final ProtocolSpecBuilder builder,
       final BftConfigOptions configOptions,
-      final BftExtraDataCodec bftExtraDataCodec) {
+      final BftExtraDataCodec bftExtraDataCodec,
+      final CustomIbftValidator validator) {
     if (configOptions.getEpochLength() <= 0) {
       throw new IllegalArgumentException("Epoch length in config must be greater than zero");
     }
@@ -126,31 +128,17 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
       throw new IllegalArgumentException("Bft Block reward in config cannot be negative");
     }
 
-    CustomIbftConfigOptions ibftConfig = config.getCustomIbftConfigOptions();
-    final int stackSizeLimit = config.getContractSizeLimit().orElse(Integer.MAX_VALUE);
-
     return builder
         .blockHeaderValidatorBuilder(
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
         .ommerHeaderValidatorBuilder(
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
-        .transactionProcessorBuilder((gasCalculator,
-                                      transactionValidator,
-                                      contractCreationProcessor,
-                                      messageCallProcessor) ->
-            new CustomIbftTransactionProcessor(
-                ibftConfig,
-                gasCalculator,
-                new IbftTransactionValidator(),
-                transactionValidator,
-                contractCreationProcessor,
-                messageCallProcessor,
-                false,
-                true,
-                stackSizeLimit,
-                FeeMarket.legacy(),
-                CoinbaseFeePriceCalculator.frontier()))
-
+        .transactionValidatorBuilder((gasCalculator, gasLimitCalculator) -> new IbftTransactionValidator(
+            validator,
+            gasCalculator,
+            gasLimitCalculator,
+            true,
+            config.getChainId()))
         .blockBodyValidatorBuilder(MainnetBlockBodyValidator::new)
         .blockValidatorBuilder(MainnetProtocolSpecs.blockValidatorBuilder())
         .blockImporterBuilder(MainnetBlockImporter::new)
