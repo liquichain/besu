@@ -49,6 +49,7 @@ public class CustomIbftTransactionProcessor extends MainnetTransactionProcessor 
     this.ibftConfig = ibftConfig;
     this.ibftTransactionValidator = ibftTransactionValidator;
   }
+
   @Override
   public TransactionProcessingResult processTransaction(
       final Blockchain blockchain,
@@ -65,6 +66,7 @@ public class CustomIbftTransactionProcessor extends MainnetTransactionProcessor 
 
 
     Address to = transaction.getTo().get();
+    LOG.info("Address To " + to);
     final Optional<Account> maybeContract = Optional.ofNullable(worldState.get(to));
 
     if (!maybeContract.isEmpty()) {
@@ -74,13 +76,17 @@ public class CustomIbftTransactionProcessor extends MainnetTransactionProcessor 
       List<String> allowList = ibftConfig.getAllowListContractAddresses();
       Account contractAccount = maybeContract.get();
       Address contractAddress = contractAccount.getAddress();
+      LOG.info("AllowList" + allowList);
       ValidationResult<TransactionInvalidReason> validationResult = ibftTransactionValidator.validateContractAddress(contractAddress, allowList);
       if (!validationResult.isValid()) {
         return TransactionProcessingResult.invalid(validationResult);
       }
     }
 
-    return processTransaction(
+
+    LOG.info("Move To Next Process");
+
+    return super.processTransaction(
         blockchain,
         worldState,
         blockHeader,

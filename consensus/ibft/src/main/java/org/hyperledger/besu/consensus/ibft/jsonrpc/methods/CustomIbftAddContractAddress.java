@@ -9,6 +9,9 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSucces
 
 public class CustomIbftAddContractAddress implements JsonRpcMethod {
 
+  public CustomIbftAddContractAddress() {
+
+  }
   @Override
   public String getName() {
     return RpcMethod.IBFT_ADD_CONTRACT_ADDRESS.getMethodName();
@@ -21,8 +24,7 @@ public class CustomIbftAddContractAddress implements JsonRpcMethod {
 
     if (add) {
 
-    }
-    else {
+    } else {
 
     }
 

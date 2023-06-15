@@ -47,6 +47,7 @@ import org.hyperledger.besu.consensus.ibft.CustomIbftProtocolScheduleBuilder;
 import org.hyperledger.besu.consensus.ibft.IbftExtraDataCodec;
 import org.hyperledger.besu.consensus.ibft.IbftForksSchedulesFactory;
 import org.hyperledger.besu.consensus.ibft.IbftGossip;
+import org.hyperledger.besu.consensus.ibft.jsonrpc.CustomIbftJsonRpcMethods;
 import org.hyperledger.besu.consensus.ibft.jsonrpc.IbftJsonRpcMethods;
 import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
 import org.hyperledger.besu.consensus.ibft.protocol.IbftSubProtocol;
@@ -110,7 +111,7 @@ public class CustomIbftBesuControllerBuilder extends BftBesuControllerBuilder {
   @Override
   protected JsonRpcMethods createAdditionalJsonRpcMethodFactory(
       final ProtocolContext protocolContext) {
-    return new IbftJsonRpcMethods(protocolContext);
+    return new CustomIbftJsonRpcMethods(protocolContext);
   }
 
   @Override
