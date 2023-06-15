@@ -48,7 +48,8 @@ public class IbftProtocolScheduleBuilder extends BaseBftProtocolScheduleBuilder 
       final PrivacyParameters privacyParameters,
       final boolean isRevertReasonEnabled,
       final BftExtraDataCodec bftExtraDataCodec,
-      final EvmConfiguration evmConfiguration) {
+      final EvmConfiguration evmConfiguration
+  ) {
     return new IbftProtocolScheduleBuilder()
         .createProtocolSchedule(
             config,

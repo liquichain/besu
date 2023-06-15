@@ -1,7 +1,6 @@
 package org.hyperledger.besu.consensus.ibft;
 
 import org.hyperledger.besu.config.CustomIbftConfigOptions;
-import org.hyperledger.besu.consensus.common.bft.validation.IbftTransactionValidator;
 import org.hyperledger.besu.datatypes.Address;
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
