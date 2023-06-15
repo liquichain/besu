@@ -46,8 +46,9 @@ dependencies {
   implementation 'com.fasterxml.jackson.core:jackson-databind'
   implementation 'org.apache.tuweni:tuweni-bytes'
   implementation 'org.apache.tuweni:tuweni-units'
+    implementation project(path: ':ethereum:permissioning')
 
-  integrationTestImplementation project(path: ':config', configuration: 'testSupportArtifacts')
+    integrationTestImplementation project(path: ':config', configuration: 'testSupportArtifacts')
   integrationTestImplementation project(path: ':ethereum:core', configuration: 'testSupportArtifacts')
 
   testImplementation project(path: ':crypto:services', configuration: 'testSupportArtifacts')

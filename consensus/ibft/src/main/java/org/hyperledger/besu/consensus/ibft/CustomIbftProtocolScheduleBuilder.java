@@ -7,9 +7,7 @@ import org.hyperledger.besu.consensus.common.ForksSchedule;
 import org.hyperledger.besu.consensus.common.bft.BftBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.common.bft.BftExtraDataCodec;
 import org.hyperledger.besu.consensus.common.bft.BftProtocolSchedule;
-import org.hyperledger.besu.consensus.common.bft.validation.EmptyTransactionBlockValidator;
 import org.hyperledger.besu.consensus.common.bft.validation.IbftTransactionValidator;
-import org.hyperledger.besu.consensus.common.bft.validation.PrivateIbftTransactionValidator;
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.core.feemarket.CoinbaseFeePriceCalculator;
@@ -27,9 +25,7 @@ import org.hyperledger.besu.evm.internal.EvmConfiguration;
 
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuilder {
@@ -131,7 +127,7 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
     }
 
     CustomIbftConfigOptions ibftConfig = config.getCustomIbftConfigOptions();
-    final int stackSizeLimit = config.getContractSizeLimit().orElse(MessageFrame.DEFAULT_MAX_STACK_SIZE);
+    final int stackSizeLimit = config.getContractSizeLimit().orElse(Integer.MAX_VALUE);
 
     return builder
         .blockHeaderValidatorBuilder(
@@ -150,10 +146,10 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
                 contractCreationProcessor,
                 messageCallProcessor,
                 false,
-                false,
+                true,
                 stackSizeLimit,
                 FeeMarket.legacy(),
-                CoinbaseFeePriceCalculator.eip1559()))
+                CoinbaseFeePriceCalculator.frontier()))
 
         .blockBodyValidatorBuilder(MainnetBlockBodyValidator::new)
         .blockValidatorBuilder(MainnetProtocolSpecs.blockValidatorBuilder())
