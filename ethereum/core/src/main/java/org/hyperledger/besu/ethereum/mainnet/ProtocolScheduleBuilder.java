@@ -364,7 +364,6 @@ public class ProtocolScheduleBuilder {
         .privacyParameters(privacyParameters)
         .privateTransactionValidatorBuilder(
             () -> new PrivateTransactionValidator(protocolSchedule.getChainId()));
-
     return modifier.apply(definition).build(protocolSchedule);
   }
 
