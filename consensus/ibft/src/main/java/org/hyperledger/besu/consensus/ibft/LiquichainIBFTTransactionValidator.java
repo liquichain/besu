@@ -1,6 +1,6 @@
 package org.hyperledger.besu.consensus.ibft;
 
-import org.hyperledger.besu.consensus.ibft.validation.CustomIbftValidator;
+import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
 import org.hyperledger.besu.datatypes.Address;
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.GasLimitCalculator;
@@ -19,17 +19,17 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class IbftTransactionValidator extends MainnetTransactionValidator {
+public class LiquichainIBFTTransactionValidator extends MainnetTransactionValidator {
   private static final Logger LOG =
-      LoggerFactory.getLogger(IbftTransactionValidator.class);
+      LoggerFactory.getLogger(LiquichainIBFTTransactionValidator.class);
 
-  private final CustomIbftValidator validator;
+  private final LiquichainIBFTValidator validator;
 
-  public IbftTransactionValidator(final CustomIbftValidator validator,
-                                  final GasCalculator gasCalculator,
-                                  final GasLimitCalculator gasLimitCalculator,
-                                  final boolean checkSignatureMalleability,
-                                  final Optional<BigInteger> chainId) {
+  public LiquichainIBFTTransactionValidator(final LiquichainIBFTValidator validator,
+                                            final GasCalculator gasCalculator,
+                                            final GasLimitCalculator gasLimitCalculator,
+                                            final boolean checkSignatureMalleability,
+                                            final Optional<BigInteger> chainId) {
     super(gasCalculator, gasLimitCalculator, checkSignatureMalleability, chainId, Set.of(TransactionType.FRONTIER,
         TransactionType.EIP1559,
         TransactionType.ACCESS_LIST,

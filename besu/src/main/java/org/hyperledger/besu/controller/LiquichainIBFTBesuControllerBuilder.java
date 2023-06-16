@@ -16,7 +16,7 @@ package org.hyperledger.besu.controller;
 
 import org.hyperledger.besu.config.BftConfigOptions;
 import org.hyperledger.besu.config.BftFork;
-import org.hyperledger.besu.config.CustomIbftConfigOptions;
+import org.hyperledger.besu.config.LiquichainIBFTConfigOptions;
 import org.hyperledger.besu.config.GenesisConfigOptions;
 import org.hyperledger.besu.consensus.common.BftValidatorOverrides;
 import org.hyperledger.besu.consensus.common.EpochManager;
@@ -43,19 +43,18 @@ import org.hyperledger.besu.consensus.common.bft.statemachine.BftFinalState;
 import org.hyperledger.besu.consensus.common.bft.statemachine.FutureMessageBuffer;
 import org.hyperledger.besu.consensus.common.validator.ValidatorProvider;
 import org.hyperledger.besu.consensus.common.validator.blockbased.BlockValidatorProvider;
-import org.hyperledger.besu.consensus.ibft.CustomIbftContext;
-import org.hyperledger.besu.consensus.ibft.CustomIbftProtocolScheduleBuilder;
+import org.hyperledger.besu.consensus.ibft.LiquichainIBFTContext;
+import org.hyperledger.besu.consensus.ibft.LiquichainIBFTProtocolScheduleBuilder;
 import org.hyperledger.besu.consensus.ibft.IbftExtraDataCodec;
 import org.hyperledger.besu.consensus.ibft.IbftForksSchedulesFactory;
 import org.hyperledger.besu.consensus.ibft.IbftGossip;
-import org.hyperledger.besu.consensus.ibft.jsonrpc.CustomIbftJsonRpcMethods;
-import org.hyperledger.besu.consensus.ibft.jsonrpc.IbftJsonRpcMethods;
+import org.hyperledger.besu.consensus.ibft.jsonrpc.LiquichainIBFTJsonRpcMethods;
 import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
 import org.hyperledger.besu.consensus.ibft.protocol.IbftSubProtocol;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftController;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftRoundFactory;
-import org.hyperledger.besu.consensus.ibft.validation.CustomIbftValidator;
+import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
 import org.hyperledger.besu.consensus.ibft.validation.MessageValidatorFactory;
 import org.hyperledger.besu.datatypes.Address;
 import org.hyperledger.besu.ethereum.ProtocolContext;
@@ -92,15 +91,15 @@ import org.slf4j.LoggerFactory;
 /**
  * The Custom Ibft besu controller builder.
  */
-public class CustomIbftBesuControllerBuilder extends BftBesuControllerBuilder {
+public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilder {
 
   private static final Logger LOG = LoggerFactory.getLogger(IbftBesuControllerBuilder.class);
   private BftEventQueue bftEventQueue;
-  private CustomIbftConfigOptions customIbftConfig;
+  private LiquichainIBFTConfigOptions liquichainIbftConfig;
   private ForksSchedule<BftConfigOptions> forksSchedule;
   private ValidatorPeers peers;
 
-  private CustomIbftValidator validator;
+  private LiquichainIBFTValidator validator;
   @Override
   protected Supplier<BftExtraDataCodec> bftExtraDataCodec() {
     return Suppliers.memoize(IbftExtraDataCodec::new);
@@ -108,16 +107,16 @@ public class CustomIbftBesuControllerBuilder extends BftBesuControllerBuilder {
 
   @Override
   protected void prepForBuild() {
-    customIbftConfig = configOptionsSupplier.get().getCustomIbftConfigOptions();
-    bftEventQueue = new BftEventQueue(customIbftConfig.getMessageQueueLimit());
+    liquichainIbftConfig = configOptionsSupplier.get().getLiquichainIBFTConfigOptions();
+    bftEventQueue = new BftEventQueue(liquichainIbftConfig.getMessageQueueLimit());
     forksSchedule = IbftForksSchedulesFactory.create(configOptionsSupplier.get());
-    validator = new CustomIbftValidator(customIbftConfig);
+    validator = new LiquichainIBFTValidator(liquichainIbftConfig);
   }
 
   @Override
   protected JsonRpcMethods createAdditionalJsonRpcMethodFactory(
       final ProtocolContext protocolContext) {
-    return new CustomIbftJsonRpcMethods(protocolContext);
+    return new LiquichainIBFTJsonRpcMethods(protocolContext);
   }
 
   @Override
@@ -173,7 +172,7 @@ public class CustomIbftBesuControllerBuilder extends BftBesuControllerBuilder {
     peers = new ValidatorPeers(validatorProvider, IbftSubProtocol.NAME);
 
     final UniqueMessageMulticaster uniqueMessageMulticaster =
-        new UniqueMessageMulticaster(peers, customIbftConfig.getGossipedHistoryLimit());
+        new UniqueMessageMulticaster(peers, liquichainIbftConfig.getGossipedHistoryLimit());
 
     final IbftGossip gossiper = new IbftGossip(uniqueMessageMulticaster);
 
@@ -184,7 +183,7 @@ public class CustomIbftBesuControllerBuilder extends BftBesuControllerBuilder {
             Util.publicKeyToAddress(nodeKey.getPublicKey()),
             proposerSelector,
             uniqueMessageMulticaster,
-            new RoundTimer(bftEventQueue, customIbftConfig.getRequestTimeoutSeconds(), bftExecutors),
+            new RoundTimer(bftEventQueue, liquichainIbftConfig.getRequestTimeoutSeconds(), bftExecutors),
             new BlockTimer(bftEventQueue, forksSchedule, bftExecutors, clock),
             blockCreatorFactory,
             clock);
@@ -199,11 +198,11 @@ public class CustomIbftBesuControllerBuilder extends BftBesuControllerBuilder {
 
     final FutureMessageBuffer futureMessageBuffer =
         new FutureMessageBuffer(
-            customIbftConfig.getFutureMessagesMaxDistance(),
-            customIbftConfig.getFutureMessagesLimit(),
+            liquichainIbftConfig.getFutureMessagesMaxDistance(),
+            liquichainIbftConfig.getFutureMessagesLimit(),
             blockchain.getChainHeadBlockNumber());
     final MessageTracker duplicateMessageTracker =
-        new MessageTracker(customIbftConfig.getDuplicateMessageLimit());
+        new MessageTracker(liquichainIbftConfig.getDuplicateMessageLimit());
 
     final MessageFactory messageFactory = new MessageFactory(nodeKey);
 
@@ -255,7 +254,7 @@ public class CustomIbftBesuControllerBuilder extends BftBesuControllerBuilder {
 
   @Override
   protected ProtocolSchedule createProtocolSchedule() {
-    return CustomIbftProtocolScheduleBuilder.create(
+    return LiquichainIBFTProtocolScheduleBuilder.create(
         configOptionsSupplier.get(),
         forksSchedule,
         privacyParameters,
@@ -280,13 +279,13 @@ public class CustomIbftBesuControllerBuilder extends BftBesuControllerBuilder {
       final WorldStateArchive worldStateArchive,
       final ProtocolSchedule protocolSchedule) {
     final GenesisConfigOptions configOptions = configOptionsSupplier.get();
-    final CustomIbftConfigOptions ibftConfig = configOptions.getCustomIbftConfigOptions();
+    final LiquichainIBFTConfigOptions ibftConfig = configOptions.getLiquichainIBFTConfigOptions();
     final EpochManager epochManager = new EpochManager(ibftConfig.getEpochLength());
 
     final BftValidatorOverrides validatorOverrides =
         convertIbftForks(configOptions.getTransitions().getIbftForks());
 
-    return new CustomIbftContext(
+    return new LiquichainIBFTContext(
         validator,
         BlockValidatorProvider.forkingValidatorProvider(
             blockchain, epochManager, bftBlockInterface().get(), validatorOverrides),

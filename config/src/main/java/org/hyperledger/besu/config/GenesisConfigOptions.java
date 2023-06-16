@@ -115,7 +115,7 @@ public interface GenesisConfigOptions {
    */
   QbftConfigOptions getQbftConfigOptions();
 
-  CustomIbftConfigOptions getCustomIbftConfigOptions();
+  LiquichainIBFTConfigOptions getLiquichainIBFTConfigOptions();
 
 
   /**
