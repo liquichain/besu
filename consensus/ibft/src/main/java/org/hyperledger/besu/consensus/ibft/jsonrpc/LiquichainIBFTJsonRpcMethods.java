@@ -1,13 +1,13 @@
 package org.hyperledger.besu.consensus.ibft.jsonrpc;
 
-import org.hyperledger.besu.consensus.ibft.CustomIbftContext;
-import org.hyperledger.besu.consensus.ibft.jsonrpc.methods.CustomIbftAddContractAddress;
+import org.hyperledger.besu.consensus.ibft.LiquichainIBFTContext;
+import org.hyperledger.besu.consensus.ibft.jsonrpc.methods.LiquichainIBFTAddContractAddress;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
 
 import java.util.Map;
 
-public class CustomIbftJsonRpcMethods extends IbftJsonRpcMethods {
+public class LiquichainIBFTJsonRpcMethods extends IbftJsonRpcMethods {
 
   private final ProtocolContext context;
 
@@ -16,7 +16,7 @@ public class CustomIbftJsonRpcMethods extends IbftJsonRpcMethods {
    *
    * @param context the context
    */
-  public CustomIbftJsonRpcMethods(final ProtocolContext context) {
+  public LiquichainIBFTJsonRpcMethods(final ProtocolContext context) {
     super(context);
     this.context = context;
   }
@@ -25,9 +25,9 @@ public class CustomIbftJsonRpcMethods extends IbftJsonRpcMethods {
   protected Map<String, JsonRpcMethod> create() {
 
     Map<String, JsonRpcMethod> methods = super.create();
-    final CustomIbftContext bftContext = context.getConsensusContext(CustomIbftContext.class);
+    final LiquichainIBFTContext bftContext = context.getConsensusContext(LiquichainIBFTContext.class);
 
-    JsonRpcMethod addContractMethod = new CustomIbftAddContractAddress(bftContext.getValidator());
+    JsonRpcMethod addContractMethod = new LiquichainIBFTAddContractAddress(bftContext.getValidator());
     methods.put(addContractMethod.getName(), addContractMethod);
     return methods;
 

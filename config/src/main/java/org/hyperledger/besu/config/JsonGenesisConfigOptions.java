@@ -41,7 +41,7 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   private static final String ETHASH_CONFIG_KEY = "ethash";
   private static final String IBFT_LEGACY_CONFIG_KEY = "ibft";
   private static final String IBFT2_CONFIG_KEY = "ibft2";
-  private static final String CUSTOM_IBFT_CONFIG_KEY = "customibft";
+  private static final String LIQUICHAIN_IBFT_CONFIG_KEY = "liquichainibft";
   private static final String QBFT_CONFIG_KEY = "qbft";
   private static final String CLIQUE_CONFIG_KEY = "clique";
   private static final String EC_CURVE_CONFIG_KEY = "eccurve";
@@ -143,7 +143,7 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-  public boolean isCustomIbft() { return configRoot.has(CUSTOM_IBFT_CONFIG_KEY); }
+  public boolean isCustomIbft() { return configRoot.has(LIQUICHAIN_IBFT_CONFIG_KEY); }
 
   @Override
   public boolean isQbft() {
@@ -171,10 +171,10 @@ public class JsonGenesisConfigOptions implements GenesisConfigOptions {
   }
 
   @Override
-  public CustomIbftConfigOptions getCustomIbftConfigOptions() {
-    return JsonUtil.getObjectNode(configRoot, CUSTOM_IBFT_CONFIG_KEY)
-        .map(JsonCustomIbftConfigOptions::new)
-        .orElse(JsonCustomIbftConfigOptions.DEFAULT);
+  public LiquichainIBFTConfigOptions getLiquichainIBFTConfigOptions() {
+    return JsonUtil.getObjectNode(configRoot, LIQUICHAIN_IBFT_CONFIG_KEY)
+        .map(JsonLiquichainIBFTConfigOptions::new)
+        .orElse(JsonLiquichainIBFTConfigOptions.DEFAULT);
   }
 
   @Override
