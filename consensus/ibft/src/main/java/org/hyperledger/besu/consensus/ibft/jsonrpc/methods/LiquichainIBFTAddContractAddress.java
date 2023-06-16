@@ -1,7 +1,6 @@
 package org.hyperledger.besu.consensus.ibft.jsonrpc.methods;
 
-import org.hyperledger.besu.config.CustomIbftConfigOptions;
-import org.hyperledger.besu.consensus.ibft.validation.CustomIbftValidator;
+import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
 import org.hyperledger.besu.datatypes.Address;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequestContext;
@@ -9,11 +8,11 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 
-public class CustomIbftAddContractAddress implements JsonRpcMethod {
+public class LiquichainIBFTAddContractAddress implements JsonRpcMethod {
 
-  private final CustomIbftValidator validator;
+  private final LiquichainIBFTValidator validator;
 
-  public CustomIbftAddContractAddress(final CustomIbftValidator validator) {
+  public LiquichainIBFTAddContractAddress(final LiquichainIBFTValidator validator) {
     this.validator = validator;
   }
 

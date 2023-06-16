@@ -72,7 +72,7 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions, Cloneable
   private Optional<String> ecCurve = Optional.empty();
   private QbftConfigOptions qbftConfigOptions = JsonQbftConfigOptions.DEFAULT;
   private BftConfigOptions bftConfigOptions = JsonBftConfigOptions.DEFAULT;
-  private CustomIbftConfigOptions customIbftConfigOptions = JsonCustomIbftConfigOptions.DEFAULT;
+  private LiquichainIBFTConfigOptions liquichainIBFTConfigOptions = JsonLiquichainIBFTConfigOptions.DEFAULT;
 
   private TransitionsConfigOptions transitions = TransitionsConfigOptions.DEFAULT;
   private static final DiscoveryOptions DISCOVERY_OPTIONS = DiscoveryOptions.DEFAULT;
@@ -141,8 +141,8 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions, Cloneable
   }
 
   @Override
-  public CustomIbftConfigOptions getCustomIbftConfigOptions() {
-    return customIbftConfigOptions;
+  public LiquichainIBFTConfigOptions getLiquichainIBFTConfigOptions() {
+    return liquichainIBFTConfigOptions;
   }
 
   @Override
@@ -874,8 +874,8 @@ public class StubGenesisConfigOptions implements GenesisConfigOptions, Cloneable
     return this;
   }
 
-  public StubGenesisConfigOptions customIbftConfigOptions(final CustomIbftConfigOptions customIbftConfigOptions) {
-    this.customIbftConfigOptions = customIbftConfigOptions;
+  public StubGenesisConfigOptions liquichainIBFTConfigOptions(final LiquichainIBFTConfigOptions liquichainIBFTConfigOptions) {
+    this.liquichainIBFTConfigOptions = liquichainIBFTConfigOptions;
     return this;
   }
 

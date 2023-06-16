@@ -1,17 +1,14 @@
 package org.hyperledger.besu.consensus.ibft;
 
-import org.hyperledger.besu.config.CustomIbftConfigOptions;
 import org.hyperledger.besu.consensus.common.EpochManager;
 import org.hyperledger.besu.consensus.common.bft.BftBlockInterface;
 import org.hyperledger.besu.consensus.common.bft.BftContext;
 import org.hyperledger.besu.consensus.common.validator.ValidatorProvider;
-import org.hyperledger.besu.consensus.ibft.validation.CustomIbftValidator;
+import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
 
-import java.util.List;
+public class LiquichainIBFTContext extends BftContext {
 
-public class CustomIbftContext extends BftContext {
-
-  private final CustomIbftValidator validator;
+  private final LiquichainIBFTValidator validator;
   /**
    * Instantiates a new Bft context.
    *
@@ -19,15 +16,15 @@ public class CustomIbftContext extends BftContext {
    * @param epochManager      the epoch manager
    * @param blockInterface    the block interface
    */
-  public CustomIbftContext(final CustomIbftValidator validator,
-                           final ValidatorProvider validatorProvider,
-                           final EpochManager epochManager,
-                           final BftBlockInterface blockInterface) {
+  public LiquichainIBFTContext(final LiquichainIBFTValidator validator,
+                               final ValidatorProvider validatorProvider,
+                               final EpochManager epochManager,
+                               final BftBlockInterface blockInterface) {
     super(validatorProvider, epochManager, blockInterface);
     this.validator = validator;
   }
 
-  public CustomIbftValidator getValidator() {
+  public LiquichainIBFTValidator getValidator() {
     return this.validator;
   }
 

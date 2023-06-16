@@ -6,7 +6,7 @@ import org.hyperledger.besu.consensus.common.ForksSchedule;
 import org.hyperledger.besu.consensus.common.bft.BftBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.common.bft.BftExtraDataCodec;
 import org.hyperledger.besu.consensus.common.bft.BftProtocolSchedule;
-import org.hyperledger.besu.consensus.ibft.validation.CustomIbftValidator;
+import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.mainnet.DefaultProtocolSchedule;
@@ -24,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuilder {
+public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleBuilder {
   private static final BigInteger DEFAULT_CHAIN_ID = BigInteger.ONE;
 
   /**
@@ -45,8 +45,8 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
       final boolean isRevertReasonEnabled,
       final BftExtraDataCodec bftExtraDataCodec,
       final EvmConfiguration evmConfiguration,
-      final CustomIbftValidator validator) {
-    return new CustomIbftProtocolScheduleBuilder()
+      final LiquichainIBFTValidator validator) {
+    return new LiquichainIBFTProtocolScheduleBuilder()
         .createProtocolSchedule(
             config,
             forksSchedule,
@@ -71,7 +71,7 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
       final ForksSchedule<BftConfigOptions> forksSchedule,
       final BftExtraDataCodec bftExtraDataCodec,
       final EvmConfiguration evmConfiguration,
-      final CustomIbftValidator validator
+      final LiquichainIBFTValidator validator
   ) {
     return create(
         config,
@@ -89,7 +89,7 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
                                                     final boolean isRevertReasonEnabled,
                                                     final BftExtraDataCodec bftExtraDataCodec,
                                                     final EvmConfiguration evmConfiguration,
-                                                    final CustomIbftValidator validator) {
+                                                    final LiquichainIBFTValidator validator) {
     final Map<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> specMap = new HashMap<>();
 
     forksSchedule
@@ -120,7 +120,7 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
       final ProtocolSpecBuilder builder,
       final BftConfigOptions configOptions,
       final BftExtraDataCodec bftExtraDataCodec,
-      final CustomIbftValidator validator) {
+      final LiquichainIBFTValidator validator) {
     if (configOptions.getEpochLength() <= 0) {
       throw new IllegalArgumentException("Epoch length in config must be greater than zero");
     }
@@ -135,9 +135,12 @@ public class CustomIbftProtocolScheduleBuilder extends IbftProtocolScheduleBuild
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
         .transactionValidatorBuilder(
             (gasCalculator, gasLimitCalculator) ->
-                new IbftTransactionValidator(
+                new LiquichainIBFTTransactionValidator(
                     validator,
-                    gasCalculator, gasLimitCalculator, false, config.getChainId()))
+                    gasCalculator,
+                    gasLimitCalculator,
+                    false,
+                    config.getChainId()))
         .blockBodyValidatorBuilder(MainnetBlockBodyValidator::new)
         .blockValidatorBuilder(MainnetProtocolSpecs.blockValidatorBuilder())
         .blockImporterBuilder(MainnetBlockImporter::new)

@@ -1,13 +1,13 @@
 package org.hyperledger.besu.consensus.ibft.validation;
 
-import org.hyperledger.besu.config.CustomIbftConfigOptions;
+import org.hyperledger.besu.config.LiquichainIBFTConfigOptions;
 
 import java.util.List;
 
-public class CustomIbftValidator {
+public class LiquichainIBFTValidator {
   private final List<String> allowList;
 
-  public CustomIbftValidator(final CustomIbftConfigOptions ibftConfigOptions) {
+  public LiquichainIBFTValidator(final LiquichainIBFTConfigOptions ibftConfigOptions) {
     allowList = ibftConfigOptions.getAllowListContractAddresses();
   }
 

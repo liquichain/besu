@@ -1,21 +1,15 @@
 package org.hyperledger.besu.config;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import kotlin.jvm.internal.TypeReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-public class JsonCustomIbftConfigOptions extends JsonBftConfigOptions implements CustomIbftConfigOptions {
-  public static final JsonCustomIbftConfigOptions DEFAULT =
-      new JsonCustomIbftConfigOptions(JsonUtil.createEmptyObjectNode());
+public class JsonLiquichainIBFTConfigOptions extends JsonBftConfigOptions implements LiquichainIBFTConfigOptions {
+  public static final JsonLiquichainIBFTConfigOptions DEFAULT =
+      new JsonLiquichainIBFTConfigOptions(JsonUtil.createEmptyObjectNode());
 
   //  private static final Logger LOG =
 //      LoggerFactory.getLogger(JsonCustomIbftConfigOptions.class);
@@ -28,7 +22,7 @@ public class JsonCustomIbftConfigOptions extends JsonBftConfigOptions implements
    *
    * @param bftConfigRoot the bft config root
    */
-  public JsonCustomIbftConfigOptions(final ObjectNode bftConfigRoot) {
+  public JsonLiquichainIBFTConfigOptions(final ObjectNode bftConfigRoot) {
     super(bftConfigRoot);
     mapper = JsonUtil.getObjectMapper();
   }
