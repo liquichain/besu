@@ -61,11 +61,15 @@ public class LiquichainIBFTTransactionProcessor extends MainnetTransactionProces
     LOG.info("Start Liquichain Transaction Process");
     if (!transaction.isContractCreation()) {
       Address to = transaction.getTo().get();
-      Optional<Account> contract = Optional.ofNullable(worldState.get(to));
-      if (contract.isPresent()) {
-        ValidationResult<TransactionInvalidReason> validationResult = liquichainTransactionValidator.validateContractAddress(contract.get().getAddress());
-        if (!validationResult.isValid()) {
-          return TransactionProcessingResult.invalid(validationResult);
+      Optional<Account> maybeContract = Optional.ofNullable(worldState.get(to));
+
+      if (maybeContract.isPresent()) {
+        Account contract = maybeContract.get();
+        if (contract.hasCode()) {
+          ValidationResult<TransactionInvalidReason> validationResult = liquichainTransactionValidator.validateContractAddress(contract.getAddress());
+          if (!validationResult.isValid()) {
+            return TransactionProcessingResult.invalid(validationResult);
+          }
         }
       }
     }
