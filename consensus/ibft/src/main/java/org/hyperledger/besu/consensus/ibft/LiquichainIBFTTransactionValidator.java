@@ -35,6 +35,7 @@ public class LiquichainIBFTTransactionValidator {
     LOG.info(allowList.toString());
     if (allowList != null && !allowList.isEmpty()) {
       final Optional<String> matchAddress = allowList.stream().filter(address -> address.equals(contractAddress.toString())).findAny();
+      LOG.info(contractAddress.toString());
       if (matchAddress.isEmpty()) {
         ValidationResult<TransactionInvalidReason> result = ValidationResult.invalid(TransactionInvalidReason.INVALID_CONTRACT_ADDRESS, "Contract address does not appear in allow list");
         return result;
