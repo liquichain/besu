@@ -14,50 +14,32 @@ import org.hyperledger.besu.plugin.data.TransactionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.text.html.Option;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class LiquichainIBFTTransactionValidator extends MainnetTransactionValidator {
+public class LiquichainIBFTTransactionValidator {
   private static final Logger LOG =
       LoggerFactory.getLogger(LiquichainIBFTTransactionValidator.class);
 
   private final LiquichainIBFTValidator validator;
 
-  public LiquichainIBFTTransactionValidator(final LiquichainIBFTValidator validator,
-                                            final GasCalculator gasCalculator,
-                                            final GasLimitCalculator gasLimitCalculator,
-                                            final boolean checkSignatureMalleability,
-                                            final Optional<BigInteger> chainId) {
-    super(gasCalculator, gasLimitCalculator, checkSignatureMalleability, chainId, Set.of(TransactionType.FRONTIER,
-        TransactionType.EIP1559,
-        TransactionType.ACCESS_LIST,
-        TransactionType.BLOB));
+  public LiquichainIBFTTransactionValidator(final LiquichainIBFTValidator validator) {
     this.validator = validator;
   }
 
-  @Override
-  public ValidationResult<TransactionInvalidReason> validate(final Transaction transaction,
-                                                             final Optional<Wei> baseFee,
-                                                             final TransactionValidationParams transactionValidationParams) {
-
+  public ValidationResult<TransactionInvalidReason> validateContractAddress(final Address contractAddress) {
     List<String> allowList = validator.getAllowListContractAddresses();
     LOG.info(allowList.toString());
     if (allowList != null && !allowList.isEmpty()) {
-      Optional<Address> contractAddress = transaction.getTo();
-      if (contractAddress.isPresent()) {
-        final Optional<String> matchAddress = allowList.stream().filter(address -> address.equals(contractAddress.get().toString())).findAny();
-        LOG.info(contractAddress.toString());
-        LOG.info(matchAddress.get());
-        if (matchAddress.isEmpty()) {
-          LOG.info(TransactionInvalidReason.INVALID_CONTRACT_ADDRESS + "Result");
-          ValidationResult<TransactionInvalidReason> result = ValidationResult.invalid(TransactionInvalidReason.INVALID_CONTRACT_ADDRESS, "Contract address does not appear in allow list");
-          LOG.debug(result.toString());
-          return result;
-        }
+      final Optional<String> matchAddress = allowList.stream().filter(address -> address.equals(contractAddress.toString())).findAny();
+      if (matchAddress.isEmpty()) {
+        ValidationResult<TransactionInvalidReason> result = ValidationResult.invalid(TransactionInvalidReason.INVALID_CONTRACT_ADDRESS, "Contract address does not appear in allow list");
+        return result;
       }
     }
-    return super.validate(transaction, baseFee, transactionValidationParams);
+    return ValidationResult.valid();
   }
 }

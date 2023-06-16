@@ -9,6 +9,7 @@ import org.hyperledger.besu.consensus.common.bft.BftProtocolSchedule;
 import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
+import org.hyperledger.besu.ethereum.core.feemarket.CoinbaseFeePriceCalculator;
 import org.hyperledger.besu.ethereum.mainnet.DefaultProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockBodyValidator;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockImporter;
@@ -17,6 +18,8 @@ import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolScheduleBuilder;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecAdapters;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecBuilder;
+import org.hyperledger.besu.ethereum.mainnet.feemarket.FeeMarket;
+import org.hyperledger.besu.evm.frame.MessageFrame;
 import org.hyperledger.besu.evm.internal.EvmConfiguration;
 
 import java.math.BigInteger;
@@ -128,19 +131,32 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
       throw new IllegalArgumentException("Bft Block reward in config cannot be negative");
     }
 
+
+    LiquichainIBFTTransactionValidator liquichainTransactionValidator = new LiquichainIBFTTransactionValidator(
+        validator);
+    final int stackSizeLimit = config.getContractSizeLimit().orElse(MessageFrame.DEFAULT_MAX_STACK_SIZE);
+
     return builder
         .blockHeaderValidatorBuilder(
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
         .ommerHeaderValidatorBuilder(
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
-        .transactionValidatorBuilder(
-            (gasCalculator, gasLimitCalculator) ->
-                new LiquichainIBFTTransactionValidator(
-                    validator,
-                    gasCalculator,
-                    gasLimitCalculator,
-                    false,
-                    config.getChainId()))
+        .transactionProcessorBuilder((gasCalculator,
+                                      transactionValidator,
+                                      contractCreationProcessor,
+                                      messageCallProcessor) -> new LiquichainIBFTTransactionProcessor(
+            gasCalculator,
+            liquichainTransactionValidator,
+            transactionValidator,
+            contractCreationProcessor,
+            messageCallProcessor,
+            true,
+            false,
+            stackSizeLimit,
+            FeeMarket.legacy(),
+            CoinbaseFeePriceCalculator.frontier()
+
+        ))
         .blockBodyValidatorBuilder(MainnetBlockBodyValidator::new)
         .blockValidatorBuilder(MainnetProtocolSpecs.blockValidatorBuilder())
         .blockImporterBuilder(MainnetBlockImporter::new)
