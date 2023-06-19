@@ -126,7 +126,7 @@ public class TransactionPool implements BlockAddedObserver {
       final File saveFile = configuration.getSaveFile();
       LOG.info("Saving transaction pool content to file {}", saveFile);
       try (final BufferedWriter bw =
-          new BufferedWriter(new FileWriter(saveFile, StandardCharsets.US_ASCII))) {
+               new BufferedWriter(new FileWriter(saveFile, StandardCharsets.US_ASCII))) {
         final var allTxs = pendingTransactions.getPendingTransactions();
         allTxs.parallelStream()
             .map(
@@ -160,7 +160,7 @@ public class TransactionPool implements BlockAddedObserver {
       if (saveFile.exists()) {
         LOG.info("Loading transaction pool content from file {}", saveFile);
         try (final BufferedReader br =
-            new BufferedReader(new FileReader(saveFile, StandardCharsets.US_ASCII))) {
+                 new BufferedReader(new FileReader(saveFile, StandardCharsets.US_ASCII))) {
           final IntSummaryStatistics stats =
               br.lines()
                   .mapToInt(
@@ -480,10 +480,26 @@ public class TransactionPool implements BlockAddedObserver {
     }
 
     try (final var worldState =
-        protocolContext
-            .getWorldStateArchive()
-            .getMutable(chainHeadBlockHeader, false)
-            .orElseThrow()) {
+             protocolContext
+                 .getWorldStateArchive()
+                 .getMutable(chainHeadBlockHeader, false)
+                 .orElseThrow()) {
+
+      if (transaction.getTo().isPresent()) {
+        final Optional<Account> toAccount = Optional.ofNullable(worldState.get(transaction.getTo().get()));
+
+        if (toAccount.isPresent()) {
+          ValidationResult<TransactionInvalidReason> validationResult = getTransactionValidator()
+              .validateForTo(transaction, toAccount.get(), TransactionValidationParams.transactionPool());
+
+          if (!validationResult.isValid()) {
+            return new ValidationResultAndAccount(
+                toAccount.get(),
+                validationResult);
+          }
+        }
+      }
+
       final Account senderAccount = worldState.get(transaction.getSender());
       return new ValidationResultAndAccount(
           senderAccount,
@@ -498,6 +514,7 @@ public class TransactionPool implements BlockAddedObserver {
     } catch (Exception ex) {
       return ValidationResultAndAccount.invalid(CHAIN_HEAD_WORLD_STATE_NOT_AVAILABLE);
     }
+
   }
 
   private TransactionInvalidReason validatePrice(
@@ -511,7 +528,7 @@ public class TransactionPool implements BlockAddedObserver {
       // allow local transactions to be below minGas as long as we are mining
       // or at least gas price is above the configured floor
       if ((!miningParameters.isMiningEnabled()
-              && isMaxGasPriceBelowConfiguredMinGasPrice(transaction))
+          && isMaxGasPriceBelowConfiguredMinGasPrice(transaction))
           || !feeMarket.satisfiesFloorTxFee(transaction)) {
         return TransactionInvalidReason.GAS_PRICE_TOO_LOW;
       }

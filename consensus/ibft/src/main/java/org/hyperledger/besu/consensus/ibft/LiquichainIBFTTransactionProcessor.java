@@ -26,12 +26,12 @@ import org.slf4j.LoggerFactory;
 import java.util.Optional;
 
 public class LiquichainIBFTTransactionProcessor extends MainnetTransactionProcessor {
-  private static final Logger LOG =
-      LoggerFactory.getLogger(LiquichainIBFTTransactionProcessor.class);
-  private final LiquichainIBFTTransactionValidator liquichainTransactionValidator;
+//  private static final Logger LOG =
+//      LoggerFactory.getLogger(LiquichainIBFTTransactionProcessor.class);
+//  private final LiquichainIBFTTransactionValidator liquichainTransactionValidator;
 
   public LiquichainIBFTTransactionProcessor(final GasCalculator gasCalculator,
-                                            final LiquichainIBFTTransactionValidator liquichainTransactionValidator,
+//                                            final LiquichainIBFTTransactionValidator liquichainTransactionValidator,
                                             final MainnetTransactionValidator transactionValidator,
                                             final AbstractMessageProcessor contractCreationProcessor,
                                             final AbstractMessageProcessor messageCallProcessor, final boolean clearEmptyAccounts,
@@ -40,7 +40,7 @@ public class LiquichainIBFTTransactionProcessor extends MainnetTransactionProces
                                             final FeeMarket feeMarket,
                                             final CoinbaseFeePriceCalculator coinbaseFeePriceCalculator) {
     super(gasCalculator, transactionValidator, contractCreationProcessor, messageCallProcessor, clearEmptyAccounts, warmCoinbase, maxStackSize, feeMarket, coinbaseFeePriceCalculator);
-    this.liquichainTransactionValidator = liquichainTransactionValidator;
+//    this.liquichainTransactionValidator = liquichainTransactionValidator;
   }
 
 
@@ -58,21 +58,21 @@ public class LiquichainIBFTTransactionProcessor extends MainnetTransactionProces
                                                         final Wei dataGasPrice) {
 
 
-    LOG.info("Start Liquichain Transaction Process");
-    if (!transaction.isContractCreation()) {
-      Address to = transaction.getTo().get();
-      Optional<Account> maybeContract = Optional.ofNullable(worldState.get(to));
-
-      if (maybeContract.isPresent()) {
-        Account contract = maybeContract.get();
-        if (contract.hasCode()) {
-          ValidationResult<TransactionInvalidReason> validationResult = liquichainTransactionValidator.validateContractAddress(contract.getAddress());
-          if (!validationResult.isValid()) {
-            return TransactionProcessingResult.invalid(validationResult);
-          }
-        }
-      }
-    }
+//    LOG.info("Start Liquichain Transaction Process");
+//    if (!transaction.isContractCreation()) {
+//      Address to = transaction.getTo().get();
+//      Optional<Account> maybeContract = Optional.ofNullable(worldState.get(to));
+//
+//      if (maybeContract.isPresent()) {
+//        Account contract = maybeContract.get();
+//        if (contract.hasCode()) {
+//          ValidationResult<TransactionInvalidReason> validationResult = liquichainTransactionValidator.validateContractAddress(contract.getAddress());
+//          if (!validationResult.isValid()) {
+//            return TransactionProcessingResult.invalid(validationResult);
+//          }
+//        }
+//      }
+//    }
 
     return super.processTransaction(ignoredBlockchain,
         worldState,

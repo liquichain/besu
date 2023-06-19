@@ -21,10 +21,12 @@ import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecBuilder;
 import org.hyperledger.besu.ethereum.mainnet.feemarket.FeeMarket;
 import org.hyperledger.besu.evm.frame.MessageFrame;
 import org.hyperledger.besu.evm.internal.EvmConfiguration;
+import org.hyperledger.besu.plugin.data.TransactionType;
 
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleBuilder {
@@ -132,8 +134,8 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
     }
 
 
-    LiquichainIBFTTransactionValidator liquichainTransactionValidator = new LiquichainIBFTTransactionValidator(
-        validator);
+//    LiquichainIBFTTransactionValidator liquichainTransactionValidator = new LiquichainIBFTTransactionValidator(
+//        validator);
     final int stackSizeLimit = config.getContractSizeLimit().orElse(MessageFrame.DEFAULT_MAX_STACK_SIZE);
 
     return builder
@@ -141,12 +143,21 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
         .ommerHeaderValidatorBuilder(
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
+        .transactionValidatorBuilder(
+            (gasCalculator, gasLimitCalculator) ->
+                new LiquichainIBFTTransactionValidator(
+                    validator,
+                    gasCalculator,
+                    gasLimitCalculator,
+                    true,
+                    config.getChainId(),
+                    Set.of(TransactionType.FRONTIER, TransactionType.ACCESS_LIST)))
         .transactionProcessorBuilder((gasCalculator,
                                       transactionValidator,
                                       contractCreationProcessor,
                                       messageCallProcessor) -> new LiquichainIBFTTransactionProcessor(
             gasCalculator,
-            liquichainTransactionValidator,
+//            liquichainTransactionValidator,
             transactionValidator,
             contractCreationProcessor,
             messageCallProcessor,
