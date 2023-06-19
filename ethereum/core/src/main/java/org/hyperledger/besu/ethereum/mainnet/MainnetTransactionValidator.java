@@ -341,4 +341,18 @@ public class MainnetTransactionValidator {
         ImmutableTransactionValidationParams.builder().isAllowFutureNonce(allowFutureNonce).build();
     return validateForSender(transaction, sender, validationParams);
   }
+
+  public ValidationResult<TransactionInvalidReason> validateForTo(final Transaction transaction,
+                                                                  final Account to,
+                                                                  final TransactionValidationParams validationParams) {
+    return ValidationResult.valid();
+  }
+
+  public ValidationResult<TransactionInvalidReason> validateForTo(final Transaction transaction,
+                                                                  final Account to,
+                                                                  final boolean allowFutureNonce) {
+    final TransactionValidationParams validationParams =
+        ImmutableTransactionValidationParams.builder().isAllowFutureNonce(allowFutureNonce).build();
+    return validateForTo(transaction, to, validationParams);
+  }
 }
