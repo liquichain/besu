@@ -77,6 +77,8 @@ public class JsonRpcErrorConverter {
         return JsonRpcError.TOTAL_DATA_GAS_TOO_HIGH;
       case TX_POOL_DISABLED:
         return JsonRpcError.TX_POOL_DISABLED;
+      case INVALID_CONTRACT_ADDRESS:
+        return JsonRpcError.INVALID_CONTRACT_ADDRESS;
       default:
         return JsonRpcError.INTERNAL_ERROR;
     }
