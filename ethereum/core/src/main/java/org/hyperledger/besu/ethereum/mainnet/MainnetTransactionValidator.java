@@ -308,4 +308,18 @@ public class MainnetTransactionValidator implements TransactionValidator {
       final PermissionTransactionFilter permissionTransactionFilter) {
     this.permissionTransactionFilter = Optional.of(permissionTransactionFilter);
   }
+
+  public ValidationResult<TransactionInvalidReason> validateForTo(final Transaction transaction,
+                                                                  final Account to,
+                                                                  final TransactionValidationParams validationParams) {
+    return ValidationResult.valid();
+  }
+
+  public ValidationResult<TransactionInvalidReason> validateForTo(final Transaction transaction,
+                                                                  final Account to,
+                                                                  final boolean allowFutureNonce) {
+    final TransactionValidationParams validationParams =
+        ImmutableTransactionValidationParams.builder().isAllowFutureNonce(allowFutureNonce).build();
+    return validateForTo(transaction, to, validationParams);
+  }
 }
