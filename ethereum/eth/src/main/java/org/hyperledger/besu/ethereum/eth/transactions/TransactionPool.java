@@ -493,9 +493,7 @@ public class TransactionPool implements BlockAddedObserver {
               .validateForTo(transaction, toAccount.get(), TransactionValidationParams.transactionPool());
 
           if (!validationResult.isValid()) {
-            return new ValidationResultAndAccount(
-                toAccount.get(),
-                validationResult);
+            return ValidationResultAndAccount.invalid(validationResult.getInvalidReason());
           }
         }
       }
