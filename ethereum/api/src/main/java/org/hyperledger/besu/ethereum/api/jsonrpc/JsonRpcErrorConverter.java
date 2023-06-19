@@ -67,6 +67,8 @@ public class JsonRpcErrorConverter {
         return JsonRpcError.LOWER_NONCE_INVALID_TRANSACTION_EXISTS;
       case TOTAL_DATA_GAS_TOO_HIGH:
         return JsonRpcError.TOTAL_DATA_GAS_TOO_HIGH;
+      case INVALID_CONTRACT_ADDRESS:
+        return JsonRpcError.INVALID_CONTRACT_ADDRESS;
       default:
         return JsonRpcError.INVALID_PARAMS;
     }

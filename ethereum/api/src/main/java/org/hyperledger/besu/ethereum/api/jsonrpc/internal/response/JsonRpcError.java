@@ -209,7 +209,8 @@ public enum JsonRpcError {
   // Retesteth Errors
 
   BLOCK_RLP_IMPORT_ERROR(-32000, "Could not decode RLP for Block"),
-  BLOCK_IMPORT_ERROR(-32000, "Could not import Block");
+  BLOCK_IMPORT_ERROR(-32000, "Could not import Block"),
+  INVALID_CONTRACT_ADDRESS(-32602, "Invalid contract address");
 
   private final int code;
   private final String message;
