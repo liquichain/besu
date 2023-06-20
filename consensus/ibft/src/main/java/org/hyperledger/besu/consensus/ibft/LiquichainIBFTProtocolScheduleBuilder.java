@@ -133,9 +133,6 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
       throw new IllegalArgumentException("Bft Block reward in config cannot be negative");
     }
 
-
-//    LiquichainIBFTTransactionValidator liquichainTransactionValidator = new LiquichainIBFTTransactionValidator(
-//        validator);
     final int stackSizeLimit = config.getContractSizeLimit().orElse(MessageFrame.DEFAULT_MAX_STACK_SIZE);
 
     return builder
@@ -157,7 +154,6 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
                                       contractCreationProcessor,
                                       messageCallProcessor) -> new LiquichainIBFTTransactionProcessor(
             gasCalculator,
-//            liquichainTransactionValidator,
             transactionValidator,
             contractCreationProcessor,
             messageCallProcessor,
