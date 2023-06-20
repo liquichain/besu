@@ -44,12 +44,14 @@ public class LiquichainIBFTTransactionValidator extends MainnetTransactionValida
 
   public LiquichainIBFTTransactionValidator(
       final LiquichainIBFTValidator validator,
+
       final GasCalculator gasCalculator,
       final GasLimitCalculator gasLimitCalculator,
       final boolean checkSignatureMalleability,
       final Optional<BigInteger> chainId,
       final Set<TransactionType> acceptedTransactionTypes) {
-    super(
+    this(
+        validator,
         gasCalculator,
         gasLimitCalculator,
         FeeMarket.legacy(),
@@ -57,6 +59,18 @@ public class LiquichainIBFTTransactionValidator extends MainnetTransactionValida
         chainId,
         acceptedTransactionTypes,
         Integer.MAX_VALUE);
+  }
+
+  public LiquichainIBFTTransactionValidator(
+      final LiquichainIBFTValidator validator,
+      final GasCalculator gasCalculator,
+      final GasLimitCalculator gasLimitCalculator,
+      final FeeMarket feeMarket,
+      final boolean checkSignatureMalleability,
+      final Optional<BigInteger> chainId,
+      final Set<TransactionType> acceptedTransactionTypes,
+      final int maxInitcodeSize) {
+    super(gasCalculator, gasLimitCalculator, feeMarket, checkSignatureMalleability, chainId, acceptedTransactionTypes, maxInitcodeSize);
     this.validator = validator;
   }
 
