@@ -9,7 +9,6 @@ import org.hyperledger.besu.consensus.common.bft.BftProtocolSchedule;
 import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
-import org.hyperledger.besu.ethereum.core.feemarket.CoinbaseFeePriceCalculator;
 import org.hyperledger.besu.ethereum.mainnet.DefaultProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockBodyValidator;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockImporter;
@@ -18,15 +17,14 @@ import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolScheduleBuilder;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecAdapters;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecBuilder;
-import org.hyperledger.besu.ethereum.mainnet.feemarket.FeeMarket;
-import org.hyperledger.besu.evm.frame.MessageFrame;
 import org.hyperledger.besu.evm.internal.EvmConfiguration;
-import org.hyperledger.besu.plugin.data.TransactionType;
 
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
+import java.util.OptionalLong;
+import java.util.TreeMap;
 import java.util.function.Function;
 
 public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleBuilder {
@@ -96,6 +94,7 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
                                                     final EvmConfiguration evmConfiguration,
                                                     final LiquichainIBFTValidator validator) {
     final Map<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> specMap = new HashMap<>();
+    final TreeMap<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> milestones = createMilestones(config, validator);
 
     forksSchedule
         .getForks()
@@ -103,7 +102,11 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
             forkSpec ->
                 specMap.put(
                     forkSpec.getBlock(),
-                    builder -> applyBftChanges(config, builder, forkSpec.getValue(), bftExtraDataCodec, validator)));
+                    builder -> applyBftChanges(forkSpec.getBlock(),
+                        milestones,
+                        builder,
+                        forkSpec.getValue(),
+                        bftExtraDataCodec)));
 
     final ProtocolSpecAdapters specAdapters = new ProtocolSpecAdapters(specMap);
 
@@ -121,11 +124,12 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
   }
 
   private ProtocolSpecBuilder applyBftChanges(
-      final GenesisConfigOptions config,
+      final long blockIdentifier,
+      final TreeMap<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> milestones,
       final ProtocolSpecBuilder builder,
       final BftConfigOptions configOptions,
-      final BftExtraDataCodec bftExtraDataCodec,
-      final LiquichainIBFTValidator validator) {
+      final BftExtraDataCodec bftExtraDataCodec
+  ) {
     if (configOptions.getEpochLength() <= 0) {
       throw new IllegalArgumentException("Epoch length in config must be greater than zero");
     }
@@ -133,37 +137,11 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
       throw new IllegalArgumentException("Bft Block reward in config cannot be negative");
     }
 
-    final int stackSizeLimit = config.getContractSizeLimit().orElse(MessageFrame.DEFAULT_MAX_STACK_SIZE);
-
-    return builder
+    builder
         .blockHeaderValidatorBuilder(
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
         .ommerHeaderValidatorBuilder(
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
-        .transactionValidatorBuilder(
-            (gasCalculator, gasLimitCalculator) ->
-                new LiquichainIBFTTransactionValidator(
-                    validator,
-                    gasCalculator,
-                    gasLimitCalculator,
-                    true,
-                    config.getChainId(),
-                    Set.of(TransactionType.FRONTIER, TransactionType.ACCESS_LIST)))
-        .transactionProcessorBuilder((gasCalculator,
-                                      transactionValidator,
-                                      contractCreationProcessor,
-                                      messageCallProcessor) -> new LiquichainIBFTTransactionProcessor(
-            gasCalculator,
-            transactionValidator,
-            contractCreationProcessor,
-            messageCallProcessor,
-            true,
-            false,
-            stackSizeLimit,
-            FeeMarket.legacy(),
-            CoinbaseFeePriceCalculator.frontier()
-
-        ))
         .blockBodyValidatorBuilder(MainnetBlockBodyValidator::new)
         .blockValidatorBuilder(MainnetProtocolSpecs.blockValidatorBuilder())
         .blockImporterBuilder(MainnetBlockImporter::new)
@@ -173,6 +151,67 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
         .blockReward(Wei.of(configOptions.getBlockRewardWei()))
         .miningBeneficiaryCalculator(
             header -> configOptions.getMiningBeneficiary().orElseGet(header::getCoinbase));
+
+    return getProtocolSpecBuilder(blockIdentifier, milestones).apply(builder);
+
   }
 
+  private Function<ProtocolSpecBuilder, ProtocolSpecBuilder> getProtocolSpecBuilder(final long blockNumberOrTimestamp,
+                                                                                    final TreeMap<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> milestones) {
+    return Optional.ofNullable(milestones.floorEntry(blockNumberOrTimestamp))
+        .orElse(milestones.firstEntry())
+        .getValue();
+  }
+
+  private TreeMap<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> createMilestones(final GenesisConfigOptions config,
+                                                                                             final LiquichainIBFTValidator validator) {
+
+    TreeMap<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> milestones = new TreeMap<>();
+
+    putMilestone(milestones, OptionalLong.of(0), builder -> LiquichainProtocolSpecs.frontierDefinition(builder, validator));
+    putMilestone(milestones, config.getHomesteadBlockNumber(), builder -> LiquichainProtocolSpecs.homesteadDefinition(builder, validator));
+    putMilestone(milestones, config.getTangerineWhistleBlockNumber(), builder -> LiquichainProtocolSpecs.tangerineWhistleDefinition(builder, validator));
+
+
+    putMilestone(milestones, config.getSpuriousDragonBlockNumber(), builder -> LiquichainProtocolSpecs.spuriousDragonDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getByzantiumBlockNumber(), builder -> LiquichainProtocolSpecs.byzantiumDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getConstantinopleBlockNumber(), builder -> LiquichainProtocolSpecs.constantinopleDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getPetersburgBlockNumber(), builder -> LiquichainProtocolSpecs.petersburgDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getIstanbulBlockNumber(), builder -> LiquichainProtocolSpecs.istanbulDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getMuirGlacierBlockNumber(), builder -> LiquichainProtocolSpecs.muirGlacierDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getBerlinBlockNumber(), builder -> LiquichainProtocolSpecs.berlinDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getLondonBlockNumber(), builder -> LiquichainProtocolSpecs.londonDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getArrowGlacierBlockNumber(), builder -> LiquichainProtocolSpecs.arrowGlacierDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getGrayGlacierBlockNumber(), builder -> LiquichainProtocolSpecs.grayGlacierDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getMergeNetSplitBlockNumber(), builder -> LiquichainProtocolSpecs.parisDefinition(builder, config.getChainId(), validator));
+    // Timestamp Forks
+    putMilestone(milestones, config.getShanghaiTime(), builder -> LiquichainProtocolSpecs.shanghaiDefinition(builder, config.getChainId(), validator, config));
+    putMilestone(milestones, config.getCancunTime(), builder -> LiquichainProtocolSpecs.cancunDefinition(builder, config.getChainId(), validator, config));
+    putMilestone(milestones, config.getFutureEipsTime(), builder -> LiquichainProtocolSpecs.futureEipsDefinition(builder, config.getChainId(), validator, config));
+    putMilestone(milestones, config.getExperimentalEipsTime(), builder -> LiquichainProtocolSpecs.experimentalEipsDefinition(builder, config.getChainId(), validator, config));
+
+    // Classic Milestones
+    putMilestone(milestones, config.getEcip1015BlockNumber(), builder -> LiquichainProtocolSpecs.classicTangerineWhistleDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getDieHardBlockNumber(), builder -> LiquichainProtocolSpecs.classicDieHardDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getGothamBlockNumber(), builder -> LiquichainProtocolSpecs.classicGothamDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getDefuseDifficultyBombBlockNumber(), builder -> LiquichainProtocolSpecs.classicDefuseDifficultyBombDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getAtlantisBlockNumber(), builder -> LiquichainProtocolSpecs.classicAtlantisDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getAghartaBlockNumber(), builder -> LiquichainProtocolSpecs.classicAghartaDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getPhoenixBlockNumber(), builder -> LiquichainProtocolSpecs.classicPhoenixDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getThanosBlockNumber(), builder -> LiquichainProtocolSpecs.classicThanosDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getMagnetoBlockNumber(), builder -> LiquichainProtocolSpecs.classicMagnetoDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getMystiqueBlockNumber(), builder -> LiquichainProtocolSpecs.classicMystiqueDefinition(builder, config.getChainId(), validator));
+
+    return milestones;
+  }
+
+  private void putMilestone(
+      final TreeMap<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> milestones,
+      final OptionalLong blockIdentifier,
+      final Function<ProtocolSpecBuilder, ProtocolSpecBuilder> modifier) {
+    if (!blockIdentifier.isEmpty()) {
+      long identifier = blockIdentifier.getAsLong();
+      milestones.put(identifier, modifier);
+    }
+  }
 }
