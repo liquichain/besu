@@ -2,7 +2,6 @@ package org.hyperledger.besu.consensus.ibft;
 
 import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
 import org.hyperledger.besu.datatypes.Address;
-import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.GasLimitCalculator;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.mainnet.MainnetTransactionValidator;
@@ -90,12 +89,19 @@ public class LiquichainIBFTTransactionValidator extends MainnetTransactionValida
 
 
   public ValidationResult<TransactionInvalidReason> validateContractAddress(final Address contractAddress) {
-    List<String> allowList = validator.getAllowListContractAddresses();
-    LOG.info(allowList.toString());
-    if (allowList != null && !allowList.isEmpty()) {
-      final Optional<String> matchAddress = allowList.stream().filter(address -> address.equals(contractAddress.toString())).findAny();
-      LOG.info(contractAddress.toString());
+    List<String> whiteList = validator.getSmartContractWhiteList();
+    if (whiteList != null && !whiteList.isEmpty()) {
+      final Optional<String> matchAddress = whiteList.stream().filter(address -> address.equals(contractAddress.toString())).findAny();
       if (matchAddress.isEmpty()) {
+        ValidationResult<TransactionInvalidReason> result = ValidationResult.invalid(TransactionInvalidReason.INVALID_CONTRACT_ADDRESS, "Contract address does not appear in allow list");
+        return result;
+      }
+    }
+
+    List<String> blackList = validator.getSmartContractBlackList();
+    if (blackList != null && !blackList.isEmpty()) {
+      final Optional<String> matchAddress = blackList.stream().filter(address -> address.equals(contractAddress.toString())).findAny();
+      if (matchAddress.isPresent()) {
         ValidationResult<TransactionInvalidReason> result = ValidationResult.invalid(TransactionInvalidReason.INVALID_CONTRACT_ADDRESS, "Contract address does not appear in allow list");
         return result;
       }

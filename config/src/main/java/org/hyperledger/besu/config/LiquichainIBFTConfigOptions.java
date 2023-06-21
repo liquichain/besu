@@ -3,5 +3,7 @@ package org.hyperledger.besu.config;
 import java.util.List;
 
 public interface LiquichainIBFTConfigOptions extends BftConfigOptions {
-  List<String> getAllowListContractAddresses();
+  List<String> getSmartContractWhiteList();
+
+  List<String> getSmartContractBlackList();
 }
