@@ -5,25 +5,44 @@ import org.hyperledger.besu.config.LiquichainIBFTConfigOptions;
 import java.util.List;
 
 public class LiquichainIBFTValidator {
-  private final List<String> allowList;
+  private final List<String> whiteList;
+  private final List<String> blackList;
 
   public LiquichainIBFTValidator(final LiquichainIBFTConfigOptions ibftConfigOptions) {
-    allowList = ibftConfigOptions.getAllowListContractAddresses();
+    whiteList = ibftConfigOptions.getSmartContractWhiteList();
+    blackList = ibftConfigOptions.getSmartContractBlackList();
   }
 
-  public List<String> getAllowListContractAddresses() {
-    return allowList;
+  public List<String> getSmartContractWhiteList() {
+    return whiteList;
   }
 
-  public void updateAllowList(final String address, final Boolean add) {
-    Boolean contain = allowList.contains(address);
+  public List<String> getSmartContractBlackList() {
+    return blackList;
+  }
+
+  public void updateSmartContractWhiteList(final String address, final Boolean add) {
+    Boolean contain = whiteList.contains(address);
     if (add) {
       if (!contain) {
-        allowList.add(address);
+        whiteList.add(address);
       }
     } else {
       if (contain) {
-        allowList.remove(address);
+        whiteList.remove(address);
+      }
+    }
+  }
+
+  public void updateSmartContractBlackList(final String address, final Boolean add) {
+    Boolean contain = blackList.contains(address);
+    if (add) {
+      if (!contain) {
+        blackList.add(address);
+      }
+    } else {
+      if (contain) {
+        blackList.remove(address);
       }
     }
   }
