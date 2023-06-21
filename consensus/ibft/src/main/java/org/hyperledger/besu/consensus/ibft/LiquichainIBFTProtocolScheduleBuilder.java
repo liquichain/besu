@@ -6,14 +6,12 @@ import org.hyperledger.besu.consensus.common.ForksSchedule;
 import org.hyperledger.besu.consensus.common.bft.BftBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.common.bft.BftExtraDataCodec;
 import org.hyperledger.besu.consensus.common.bft.BftProtocolSchedule;
-import org.hyperledger.besu.consensus.common.bft.validation.EmptyTransactionBlockValidator;
 import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.mainnet.DefaultProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockBodyValidator;
 import org.hyperledger.besu.ethereum.mainnet.MainnetBlockImporter;
-import org.hyperledger.besu.ethereum.mainnet.MainnetProtocolSpecs;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolScheduleBuilder;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecAdapters;
@@ -106,6 +104,7 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
                     builder -> applyBftChanges(forkSpec.getBlock(),
                         milestones,
                         builder,
+                        config,
                         forkSpec.getValue(),
                         bftExtraDataCodec)));
 
@@ -128,6 +127,7 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
       final long blockIdentifier,
       final TreeMap<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> milestones,
       final ProtocolSpecBuilder builder,
+      final GenesisConfigOptions genesisConfigOptions,
       final BftConfigOptions configOptions,
       final BftExtraDataCodec bftExtraDataCodec
   ) {
@@ -144,7 +144,15 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
         .ommerHeaderValidatorBuilder(
             feeMarket -> createBlockHeaderRuleset(configOptions, feeMarket))
         .blockBodyValidatorBuilder(MainnetBlockBodyValidator::new)
-        .blockValidatorBuilder(EmptyTransactionBlockValidator::new)
+        .blockValidatorBuilder((blockHeaderValidator,
+                                blockBodyValidator,
+                                blockProcessor,
+                                badBlockManager) ->
+            new LiquichainIBFTBlockValidator(genesisConfigOptions.getLiquichainIBFTConfigOptions(),
+                blockHeaderValidator,
+                blockBodyValidator,
+                blockProcessor,
+                badBlockManager))
         .blockImporterBuilder(MainnetBlockImporter::new)
         .difficultyCalculator((time, parent, protocolContext) -> BigInteger.ONE)
         .skipZeroBlockRewards(true)

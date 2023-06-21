@@ -6,4 +6,6 @@ public interface LiquichainIBFTConfigOptions extends BftConfigOptions {
   List<String> getSmartContractWhiteList();
 
   List<String> getSmartContractBlackList();
+
+  long getNoTransactionBlockPeriodSeconds();
 }
