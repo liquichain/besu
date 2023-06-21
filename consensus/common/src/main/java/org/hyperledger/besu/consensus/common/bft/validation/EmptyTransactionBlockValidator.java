@@ -35,13 +35,13 @@ public class EmptyTransactionBlockValidator extends MainnetBlockValidator {
       final boolean shouldPersist,
       final boolean shouldRecordBadBlock) {
 
-//    final BlockBody blockBody = block.getBody();
-//    LOG.info("validateBlock" + blockBody.toString());
+    final BlockBody blockBody = block.getBody();
+    LOG.info("validateBlock" + blockBody.toString());
 
-//    if (blockBody.getTransactions().isEmpty()) {
-//      LOG.info("Block validation", "Block has no transaction");
-//      return new BlockProcessingResult("Block has no transaction");
-//    }
+    if (blockBody.getTransactions().isEmpty()) {
+      LOG.info("Block validation", "Block has no transaction");
+      return new BlockProcessingResult("Block has no transaction");
+    }
 
     return super.validateAndProcessBlock(context, block, headerValidationMode, ommerValidationMode, shouldPersist, shouldRecordBadBlock);
   }
