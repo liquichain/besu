@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class JsonLiquichainIBFTConfigOptions extends JsonBftConfigOptions implements LiquichainIBFTConfigOptions {
   public static final JsonLiquichainIBFTConfigOptions DEFAULT =
@@ -29,10 +31,15 @@ public class JsonLiquichainIBFTConfigOptions extends JsonBftConfigOptions implem
 
   @Override
   public List<String> getAllowListContractAddresses() {
+    Optional<ArrayNode> maybeNode = JsonUtil.getArrayNode(this.bftConfigRoot, CONTRACT_ADDRESSES_KEY);
 
-    ArrayNode node = JsonUtil.getArrayNode(this.bftConfigRoot, CONTRACT_ADDRESSES_KEY).get();
+
     try {
-      allowList = mapper.treeToValue(node, mapper.getTypeFactory().constructCollectionType(List.class, String.class));
+      if (maybeNode.isEmpty()) {
+        allowList = new ArrayList<>();
+      } else {
+        allowList = mapper.treeToValue(maybeNode.get(), mapper.getTypeFactory().constructCollectionType(List.class, String.class));
+      }
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
     }
