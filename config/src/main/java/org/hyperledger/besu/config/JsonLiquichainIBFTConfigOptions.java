@@ -8,16 +8,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalLong;
 
 public class JsonLiquichainIBFTConfigOptions extends JsonBftConfigOptions implements LiquichainIBFTConfigOptions {
-  public static final JsonLiquichainIBFTConfigOptions DEFAULT =
-      new JsonLiquichainIBFTConfigOptions(JsonUtil.createEmptyObjectNode());
+  public static final JsonLiquichainIBFTConfigOptions DEFAULT = new JsonLiquichainIBFTConfigOptions(
+      JsonUtil.createEmptyObjectNode());
 
-  //  private static final Logger LOG =
-//      LoggerFactory.getLogger(JsonCustomIbftConfigOptions.class);
+  // private static final Logger LOG =
+  // LoggerFactory.getLogger(JsonCustomIbftConfigOptions.class);
   private static final String SMART_CONTRACT_WHITELIST_KEY = "smartcontractwhitelist";
   private static final String SMART_CONTRACT_BLACKLIST_KEY = "smartcontractblacklist";
 
+  private static final String MAX_BLOCK_FORGING_DELAY_KEY = "notransactionblockperiodseconds";
   private final ObjectMapper mapper;
 
   /**
@@ -38,7 +40,8 @@ public class JsonLiquichainIBFTConfigOptions extends JsonBftConfigOptions implem
 
     try {
       if (maybeNode.isPresent()) {
-        whiteList = mapper.treeToValue(maybeNode.get(), mapper.getTypeFactory().constructCollectionType(List.class, String.class));
+        whiteList = mapper.treeToValue(maybeNode.get(),
+            mapper.getTypeFactory().constructCollectionType(List.class, String.class));
       }
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
@@ -53,7 +56,8 @@ public class JsonLiquichainIBFTConfigOptions extends JsonBftConfigOptions implem
     List<String> blackList = new ArrayList<>();
     try {
       if (maybeNode.isPresent()) {
-        blackList = mapper.treeToValue(maybeNode.get(), mapper.getTypeFactory().constructCollectionType(List.class, String.class));
+        blackList = mapper.treeToValue(maybeNode.get(),
+            mapper.getTypeFactory().constructCollectionType(List.class, String.class));
       }
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
@@ -62,4 +66,12 @@ public class JsonLiquichainIBFTConfigOptions extends JsonBftConfigOptions implem
     return blackList;
   }
 
+  @Override
+  public long getNoTransactionBlockPeriodSeconds() {
+    OptionalLong blockForgingDelay = JsonUtil.getLong(this.bftConfigRoot, MAX_BLOCK_FORGING_DELAY_KEY);
+    if (blockForgingDelay.isEmpty()) {
+      return 0;
+    }
+    return blockForgingDelay.getAsLong();
+  }
 }
