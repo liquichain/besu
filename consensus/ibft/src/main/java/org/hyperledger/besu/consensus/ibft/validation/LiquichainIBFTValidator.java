@@ -1,6 +1,8 @@
 package org.hyperledger.besu.consensus.ibft.validation;
 
 import org.hyperledger.besu.config.LiquichainIBFTConfigOptions;
+import org.hyperledger.besu.ethereum.eth.manager.EthContext;
+import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 
 import java.util.List;
 
@@ -8,9 +10,17 @@ public class LiquichainIBFTValidator {
   private final List<String> whiteList;
   private final List<String> blackList;
 
+
+  private EthContext ethContext;
+
   public LiquichainIBFTValidator(final LiquichainIBFTConfigOptions ibftConfigOptions) {
     whiteList = ibftConfigOptions.getSmartContractWhiteList();
     blackList = ibftConfigOptions.getSmartContractBlackList();
+  }
+
+  public void setEthContext(EthContext context) {
+    ethContext = context;
+    ethContext.getEthPeers().subscribeConnect(this::handlePeer);
   }
 
   public List<String> getSmartContractWhiteList() {
@@ -46,4 +56,10 @@ public class LiquichainIBFTValidator {
       }
     }
   }
+
+  public void handlePeer(final EthPeer peer) {
+
+
+  }
+
 }

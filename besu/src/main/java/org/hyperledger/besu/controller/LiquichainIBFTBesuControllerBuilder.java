@@ -51,6 +51,7 @@ import org.hyperledger.besu.consensus.ibft.IbftGossip;
 import org.hyperledger.besu.consensus.ibft.jsonrpc.LiquichainIBFTJsonRpcMethods;
 import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
 import org.hyperledger.besu.consensus.ibft.protocol.IbftSubProtocol;
+import org.hyperledger.besu.consensus.ibft.protocol.LiquichainIBFTSubProtocol;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftController;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftRoundFactory;
@@ -68,6 +69,7 @@ import org.hyperledger.besu.ethereum.core.MiningParameters;
 import org.hyperledger.besu.ethereum.core.Util;
 import org.hyperledger.besu.ethereum.eth.EthProtocol;
 import org.hyperledger.besu.ethereum.eth.SnapProtocol;
+import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
 import org.hyperledger.besu.ethereum.eth.manager.snap.SnapProtocolManager;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
@@ -100,6 +102,7 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
   private ValidatorPeers peers;
 
   private LiquichainIBFTValidator validator;
+
   @Override
   protected Supplier<BftExtraDataCodec> bftExtraDataCodec() {
     return Suppliers.memoize(IbftExtraDataCodec::new);
@@ -134,6 +137,7 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
         snapProtocolManager -> {
           subProtocolConfiguration.withSubProtocol(SnapProtocol.get(), snapProtocolManager);
         });
+
     return subProtocolConfiguration;
   }
 
@@ -148,6 +152,9 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
     final BftExecutors bftExecutors =
         BftExecutors.create(metricsSystem, BftExecutors.ConsensusType.IBFT);
+
+
+    validator.setEthContext(ethProtocolManager.ethContext());
 
     final Address localAddress = Util.publicKeyToAddress(nodeKey.getPublicKey());
     final BftProtocolSchedule bftProtocolSchedule = (BftProtocolSchedule) protocolSchedule;
