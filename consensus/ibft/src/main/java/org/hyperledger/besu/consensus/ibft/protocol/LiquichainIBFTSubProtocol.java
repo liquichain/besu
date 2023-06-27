@@ -21,7 +21,7 @@ public class LiquichainIBFTSubProtocol implements SubProtocol {
   }
 
   @Override
-  public int messageSpace(int protocolVersion) {
+  public int messageSpace(final int protocolVersion) {
     return MESSAGE_SPACE;
   }
 
@@ -31,7 +31,7 @@ public class LiquichainIBFTSubProtocol implements SubProtocol {
 
 
   @Override
-  public boolean isValidMessageCode(int protocolVersion, int code) {
+  public boolean isValidMessageCode(final int protocolVersion, final int code) {
     switch (code) {
       case LiquichainIBFT.CONTRACT_ADDRESS_LIST:
         return true;
@@ -41,7 +41,7 @@ public class LiquichainIBFTSubProtocol implements SubProtocol {
   }
 
   @Override
-  public String messageName(int protocolVersion, int code) {
+  public String messageName(final int protocolVersion, final int code) {
     switch (code) {
       case LiquichainIBFT.CONTRACT_ADDRESS_LIST:
         return "ContractAddressList";

@@ -20,8 +20,6 @@ import java.util.List;
 import java.util.Optional;
 
 public class LiquichainIBFTBlockValidator extends MainnetBlockValidator {
-  private static final Logger LOG =
-      LoggerFactory.getLogger(LiquichainIBFTBlockValidator.class);
 
   private final LiquichainIBFTConfigOptions configOptions;
 
