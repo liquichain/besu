@@ -44,6 +44,7 @@ import org.hyperledger.besu.consensus.common.bft.statemachine.FutureMessageBuffe
 import org.hyperledger.besu.consensus.common.validator.ValidatorProvider;
 import org.hyperledger.besu.consensus.common.validator.blockbased.BlockValidatorProvider;
 import org.hyperledger.besu.consensus.ibft.LiquichainIBFTContext;
+import org.hyperledger.besu.consensus.ibft.LiquichainIBFTProtocolManager;
 import org.hyperledger.besu.consensus.ibft.LiquichainIBFTProtocolScheduleBuilder;
 import org.hyperledger.besu.consensus.ibft.IbftExtraDataCodec;
 import org.hyperledger.besu.consensus.ibft.IbftForksSchedulesFactory;
@@ -126,13 +127,19 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
   protected SubProtocolConfiguration createSubProtocolConfiguration(
       final EthProtocolManager ethProtocolManager,
       final Optional<SnapProtocolManager> maybeSnapProtocolManager) {
+
+    validator.setEthContext(ethProtocolManager.ethContext());
+
     final SubProtocolConfiguration subProtocolConfiguration =
         new SubProtocolConfiguration()
             .withSubProtocol(EthProtocol.get(), ethProtocolManager)
             .withSubProtocol(
                 IbftSubProtocol.get(),
                 new BftProtocolManager(
-                    bftEventQueue, peers, IbftSubProtocol.IBFV1, IbftSubProtocol.get().getName()));
+                    bftEventQueue, peers, IbftSubProtocol.IBFV1, IbftSubProtocol.get().getName()))
+            .withSubProtocol(LiquichainIBFTSubProtocol.get(), new LiquichainIBFTProtocolManager(validator,
+                LiquichainIBFTSubProtocol.LiquichainIBFTV1,
+                LiquichainIBFTSubProtocol.get().getName()));
     maybeSnapProtocolManager.ifPresent(
         snapProtocolManager -> {
           subProtocolConfiguration.withSubProtocol(SnapProtocol.get(), snapProtocolManager);
@@ -152,9 +159,6 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
     final MutableBlockchain blockchain = protocolContext.getBlockchain();
     final BftExecutors bftExecutors =
         BftExecutors.create(metricsSystem, BftExecutors.ConsensusType.IBFT);
-
-
-    validator.setEthContext(ethProtocolManager.ethContext());
 
     final Address localAddress = Util.publicKeyToAddress(nodeKey.getPublicKey());
     final BftProtocolSchedule bftProtocolSchedule = (BftProtocolSchedule) protocolSchedule;

@@ -4,6 +4,7 @@ import org.apache.tuweni.bytes.Bytes;
 import org.hyperledger.besu.consensus.common.bft.messagedata.AbstractBftMessageData;
 import org.hyperledger.besu.consensus.ibft.encoder.StringEncoder;
 import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPInput;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
@@ -20,9 +21,11 @@ public class LiquichainIBFTContractAddressListMessageData extends AbstractBftMes
     super(data);
   }
 
+  private static final int MESSAGE_CODE = LiquichainIBFT.CONTRACT_ADDRESS_LIST;
+
   @Override
   public int getCode() {
-    return LiquichainIBFT.CONTRACT_ADDRESS_LIST;
+    return MESSAGE_CODE;
   }
 
   /**
@@ -47,10 +50,17 @@ public class LiquichainIBFTContractAddressListMessageData extends AbstractBftMes
     return new LiquichainIBFTContractAddressListMessageData(out.encoded());
   }
 
-  public String getType() {
+  public static LiquichainIBFTContractAddressListMessageData fromMessageData(final MessageData messageData) {
+    return fromMessageData(messageData,
+        MESSAGE_CODE,
+        LiquichainIBFTContractAddressListMessageData.class,
+        LiquichainIBFTContractAddressListMessageData::new);
+  }
+
+  public LiquichainIBFTAllowListType getType() {
     final BytesValueRLPInput input = new BytesValueRLPInput(data, false);
     final Bytes type = input.readBytes();
-    return StringEncoder.readBytes(type);
+    return LiquichainIBFTAllowListType.fromString(StringEncoder.readBytes(type));
   }
 
   public List<String> getContractAddressList() {
