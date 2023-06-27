@@ -6,20 +6,29 @@ import org.hyperledger.besu.consensus.ibft.messagedata.LiquichainIBFTContractAdd
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 
 public class LiquichainIBFTValidator {
   private final List<String> whiteList;
   private final List<String> blackList;
-
+  private final Map<String, List<String>> peersWhiteList;
+  private final Map<String, List<String>> peersBlackList;
 
   private EthContext ethContext;
+
+  private static final Logger LOG = LoggerFactory.getLogger(LiquichainIBFTValidator.class);
 
   public LiquichainIBFTValidator(final LiquichainIBFTConfigOptions ibftConfigOptions) {
     whiteList = ibftConfigOptions.getSmartContractWhiteList();
     blackList = ibftConfigOptions.getSmartContractBlackList();
+
+    peersWhiteList = new HashMap<>();
+    peersBlackList = new HashMap<>();
   }
 
   public void setEthContext(final EthContext context) {
@@ -58,6 +67,15 @@ public class LiquichainIBFTValidator {
       if (contain) {
         blackList.remove(address);
       }
+    }
+  }
+
+  public void updatePeerContractAddressList(final String peerId, final List<String> contractAddresses, final LiquichainIBFTAllowListType type) {
+    LOG.info(String.format("PeerId: %s, ContractCount: %d, type: %s", peerId, contractAddresses.size(), type.getValue()));
+    if (type.equals(LiquichainIBFTAllowListType.BLACK_LIST)) {
+      peersBlackList.put(peerId, contractAddresses);
+    } else {
+      peersWhiteList.put(peerId, contractAddresses);
     }
   }
 
