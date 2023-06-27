@@ -13,7 +13,7 @@ public class LiquichainIBFTGossip {
 
   }
 
-  public void send(final EthPeer peer, MessageData messageData) {
+  public void send(final EthPeer peer, final MessageData messageData) {
     try {
       peer.send(messageData);
     } catch (PeerConnection.PeerNotConnected e) {
