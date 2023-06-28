@@ -65,6 +65,7 @@ public class LiquichainIBFTContractAddressListMessageData extends AbstractBftMes
 
   public List<String> getContractAddressList() {
     final BytesValueRLPInput input = new BytesValueRLPInput(data, false);
+    input.skipNext();
     return input.readList(this::readFrom);
   }
 
