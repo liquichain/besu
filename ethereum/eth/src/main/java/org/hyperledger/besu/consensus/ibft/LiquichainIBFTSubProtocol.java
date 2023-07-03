@@ -1,6 +1,5 @@
-package org.hyperledger.besu.consensus.ibft.protocol;
+package org.hyperledger.besu.consensus.ibft;
 
-import org.hyperledger.besu.consensus.ibft.messagedata.LiquichainIBFT;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.SubProtocol;
 

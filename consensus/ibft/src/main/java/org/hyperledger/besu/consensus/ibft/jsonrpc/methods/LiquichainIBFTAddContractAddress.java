@@ -1,7 +1,7 @@
 package org.hyperledger.besu.consensus.ibft.jsonrpc.methods;
 
-import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
 import org.hyperledger.besu.consensus.ibft.LiquichainIBFTValidationProvider;
+import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequestContext;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;

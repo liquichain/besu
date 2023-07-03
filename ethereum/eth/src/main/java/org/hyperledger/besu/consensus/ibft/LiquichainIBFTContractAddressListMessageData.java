@@ -1,17 +1,18 @@
-package org.hyperledger.besu.consensus.ibft.messagedata;
+package org.hyperledger.besu.consensus.ibft;
 
 import org.apache.tuweni.bytes.Bytes;
-import org.hyperledger.besu.consensus.common.bft.messagedata.AbstractBftMessageData;
 import org.hyperledger.besu.consensus.ibft.encoder.StringEncoder;
 import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
+import org.hyperledger.besu.ethereum.p2p.rlpx.wire.AbstractMessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPInput;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 
 import java.util.List;
+import java.util.function.Function;
 
-public class LiquichainIBFTContractAddressListMessageData extends AbstractBftMessageData {
+public class LiquichainIBFTContractAddressListMessageData extends AbstractLiquichainMessageData {
   /**
    * Instantiates a new Abstract bft message data.
    *
