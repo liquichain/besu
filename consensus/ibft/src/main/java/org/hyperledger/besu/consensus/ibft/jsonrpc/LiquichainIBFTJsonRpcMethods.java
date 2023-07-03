@@ -27,7 +27,7 @@ public class LiquichainIBFTJsonRpcMethods extends IbftJsonRpcMethods {
     Map<String, JsonRpcMethod> methods = super.create();
     final LiquichainIBFTContext bftContext = context.getConsensusContext(LiquichainIBFTContext.class);
 
-    JsonRpcMethod addContractMethod = new LiquichainIBFTAddContractAddress(bftContext.getValidator());
+    JsonRpcMethod addContractMethod = new LiquichainIBFTAddContractAddress(bftContext.getValidationProvider());
     methods.put(addContractMethod.getName(), addContractMethod);
     return methods;
 

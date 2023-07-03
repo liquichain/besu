@@ -56,7 +56,7 @@ import org.hyperledger.besu.consensus.ibft.protocol.LiquichainIBFTSubProtocol;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftController;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftRoundFactory;
-import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
+import org.hyperledger.besu.consensus.ibft.LiquichainIBFTValidationProvider;
 import org.hyperledger.besu.consensus.ibft.validation.MessageValidatorFactory;
 import org.hyperledger.besu.datatypes.Address;
 import org.hyperledger.besu.ethereum.ProtocolContext;
@@ -70,7 +70,6 @@ import org.hyperledger.besu.ethereum.core.MiningParameters;
 import org.hyperledger.besu.ethereum.core.Util;
 import org.hyperledger.besu.ethereum.eth.EthProtocol;
 import org.hyperledger.besu.ethereum.eth.SnapProtocol;
-import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthProtocolManager;
 import org.hyperledger.besu.ethereum.eth.manager.snap.SnapProtocolManager;
 import org.hyperledger.besu.ethereum.eth.sync.state.SyncState;
@@ -102,7 +101,7 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
   private ForksSchedule<BftConfigOptions> forksSchedule;
   private ValidatorPeers peers;
 
-  private LiquichainIBFTValidator validator;
+  private LiquichainIBFTValidationProvider validationProvider;
 
   @Override
   protected Supplier<BftExtraDataCodec> bftExtraDataCodec() {
@@ -114,7 +113,7 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
     liquichainIbftConfig = configOptionsSupplier.get().getLiquichainIBFTConfigOptions();
     bftEventQueue = new BftEventQueue(liquichainIbftConfig.getMessageQueueLimit());
     forksSchedule = IbftForksSchedulesFactory.create(configOptionsSupplier.get());
-    validator = new LiquichainIBFTValidator(liquichainIbftConfig);
+    validationProvider = new LiquichainIBFTValidationProvider(liquichainIbftConfig);
   }
 
   @Override
@@ -128,7 +127,7 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
       final EthProtocolManager ethProtocolManager,
       final Optional<SnapProtocolManager> maybeSnapProtocolManager) {
 
-    validator.setEthContext(ethProtocolManager.ethContext());
+    validationProvider.setEthContext(ethProtocolManager.ethContext());
 
     final SubProtocolConfiguration subProtocolConfiguration =
         new SubProtocolConfiguration()
@@ -137,7 +136,7 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
                 IbftSubProtocol.get(),
                 new BftProtocolManager(
                     bftEventQueue, peers, IbftSubProtocol.IBFV1, IbftSubProtocol.get().getName()))
-            .withSubProtocol(LiquichainIBFTSubProtocol.get(), new LiquichainIBFTProtocolManager(validator,
+            .withSubProtocol(LiquichainIBFTSubProtocol.get(), new LiquichainIBFTProtocolManager(validationProvider,
                 LiquichainIBFTSubProtocol.LiquichainIBFTV1,
                 LiquichainIBFTSubProtocol.get().getName()));
     maybeSnapProtocolManager.ifPresent(
@@ -272,7 +271,7 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
         isRevertReasonEnabled,
         bftExtraDataCodec().get(),
         evmConfiguration,
-        validator);
+        validationProvider);
   }
 
   @Override
@@ -297,7 +296,7 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
         convertIbftForks(configOptions.getTransitions().getIbftForks());
 
     return new LiquichainIBFTContext(
-        validator,
+        validationProvider,
         BlockValidatorProvider.forkingValidatorProvider(
             blockchain, epochManager, bftBlockInterface().get(), validatorOverrides),
         epochManager,

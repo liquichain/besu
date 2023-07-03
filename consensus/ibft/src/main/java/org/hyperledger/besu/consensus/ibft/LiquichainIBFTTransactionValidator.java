@@ -1,6 +1,5 @@
 package org.hyperledger.besu.consensus.ibft;
 
-import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
 import org.hyperledger.besu.datatypes.Address;
 import org.hyperledger.besu.ethereum.GasLimitCalculator;
 import org.hyperledger.besu.ethereum.core.Transaction;
@@ -24,16 +23,16 @@ public class LiquichainIBFTTransactionValidator extends MainnetTransactionValida
   private static final Logger LOG =
       LoggerFactory.getLogger(LiquichainIBFTTransactionValidator.class);
 
-  private final LiquichainIBFTValidator validator;
+  private final LiquichainIBFTValidationProvider validationProvider;
 
   public LiquichainIBFTTransactionValidator(
-      final LiquichainIBFTValidator validator,
+      final LiquichainIBFTValidationProvider validationProvider,
       final GasCalculator gasCalculator,
       final GasLimitCalculator gasLimitCalculator,
       final boolean checkSignatureMalleability,
       final Optional<BigInteger> chainId) {
     this(
-        validator,
+        validationProvider,
         gasCalculator,
         gasLimitCalculator,
         checkSignatureMalleability,
@@ -42,7 +41,7 @@ public class LiquichainIBFTTransactionValidator extends MainnetTransactionValida
   }
 
   public LiquichainIBFTTransactionValidator(
-      final LiquichainIBFTValidator validator,
+      final LiquichainIBFTValidationProvider validationProvider,
 
       final GasCalculator gasCalculator,
       final GasLimitCalculator gasLimitCalculator,
@@ -50,7 +49,7 @@ public class LiquichainIBFTTransactionValidator extends MainnetTransactionValida
       final Optional<BigInteger> chainId,
       final Set<TransactionType> acceptedTransactionTypes) {
     this(
-        validator,
+        validationProvider,
         gasCalculator,
         gasLimitCalculator,
         FeeMarket.legacy(),
@@ -61,7 +60,7 @@ public class LiquichainIBFTTransactionValidator extends MainnetTransactionValida
   }
 
   public LiquichainIBFTTransactionValidator(
-      final LiquichainIBFTValidator validator,
+      final LiquichainIBFTValidationProvider validationProvider,
       final GasCalculator gasCalculator,
       final GasLimitCalculator gasLimitCalculator,
       final FeeMarket feeMarket,
@@ -70,7 +69,7 @@ public class LiquichainIBFTTransactionValidator extends MainnetTransactionValida
       final Set<TransactionType> acceptedTransactionTypes,
       final int maxInitcodeSize) {
     super(gasCalculator, gasLimitCalculator, feeMarket, checkSignatureMalleability, chainId, acceptedTransactionTypes, maxInitcodeSize);
-    this.validator = validator;
+    this.validationProvider = validationProvider;
   }
 
   @Override
@@ -89,7 +88,7 @@ public class LiquichainIBFTTransactionValidator extends MainnetTransactionValida
 
 
   public ValidationResult<TransactionInvalidReason> validateContractAddress(final Address contractAddress) {
-    List<String> whiteList = validator.getSmartContractWhiteList();
+    List<String> whiteList = validationProvider.getSmartContractWhiteList();
     if (whiteList != null && !whiteList.isEmpty()) {
       final Optional<String> matchAddress = whiteList.stream().filter(address -> address.equals(contractAddress.toString())).findAny();
       if (matchAddress.isEmpty()) {
@@ -98,7 +97,7 @@ public class LiquichainIBFTTransactionValidator extends MainnetTransactionValida
       }
     }
 
-    List<String> blackList = validator.getSmartContractBlackList();
+    List<String> blackList = validationProvider.getSmartContractBlackList();
     if (blackList != null && !blackList.isEmpty()) {
       final Optional<String> matchAddress = blackList.stream().filter(address -> address.equals(contractAddress.toString())).findAny();
       if (matchAddress.isPresent()) {

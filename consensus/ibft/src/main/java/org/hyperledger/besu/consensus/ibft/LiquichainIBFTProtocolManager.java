@@ -1,16 +1,13 @@
 package org.hyperledger.besu.consensus.ibft;
 
 import org.apache.tuweni.bytes.Bytes;
-import org.hyperledger.besu.consensus.ibft.encoder.StringEncoder;
 import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
 import org.hyperledger.besu.consensus.ibft.messagedata.LiquichainIBFTContractAddressListMessageData;
-import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
 import org.hyperledger.besu.ethereum.p2p.network.ProtocolManager;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Message;
-import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,14 +18,14 @@ import java.util.List;
 public class LiquichainIBFTProtocolManager implements ProtocolManager {
   private final String subProtocolName;
   private final Capability supportedCapability;
-  private final LiquichainIBFTValidator validator;
+  private final LiquichainIBFTValidationProvider validationProvider;
 
   private static final Logger LOG = LoggerFactory.getLogger(LiquichainIBFTProtocolManager.class);
 
-  public LiquichainIBFTProtocolManager(final LiquichainIBFTValidator validator, final Capability supportedCapability, final String subProtocolName) {
+  public LiquichainIBFTProtocolManager(final LiquichainIBFTValidationProvider validationProvider, final Capability supportedCapability, final String subProtocolName) {
     this.subProtocolName = subProtocolName;
     this.supportedCapability = supportedCapability;
-    this.validator = validator;
+    this.validationProvider = validationProvider;
   }
 
   @Override
@@ -60,7 +57,7 @@ public class LiquichainIBFTProtocolManager implements ProtocolManager {
     final LiquichainIBFTAllowListType type = messageData.getType();
     LOG.info("ContractAddress " + contractAddressList);
     LOG.info("Type " + type);
-    validator.updatePeerContractAddressList(peerId.toString(), contractAddressList, type);
+    validationProvider.updatePeerContractAddressList(peerId.toString(), contractAddressList, type);
   }
 
   @Override
