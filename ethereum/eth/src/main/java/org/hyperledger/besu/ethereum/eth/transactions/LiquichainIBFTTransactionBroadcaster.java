@@ -1,5 +1,6 @@
 package org.hyperledger.besu.ethereum.eth.transactions;
 
+import org.hyperledger.besu.consensus.ibft.LiquichainIBFTTransactionContext;
 import org.hyperledger.besu.consensus.ibft.LiquichainIBFTValidationProvider;
 import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
 import org.hyperledger.besu.ethereum.ProtocolContext;
@@ -59,6 +60,7 @@ public class LiquichainIBFTTransactionBroadcaster extends TransactionBroadcaster
     this.ethContext = ethContext;
     this.transactionTracker = transactionTracker;
     this.protocolContext = protocolContext;
+    this.validationProvider = protocolContext.getConsensusContext(LiquichainIBFTTransactionContext.class).getValidationProvider();
   }
 
 
