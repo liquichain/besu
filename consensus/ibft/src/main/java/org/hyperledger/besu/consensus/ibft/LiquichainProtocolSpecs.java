@@ -1,7 +1,6 @@
 package org.hyperledger.besu.consensus.ibft;
 
 import org.hyperledger.besu.config.GenesisConfigOptions;
-import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSpecBuilder;
 import org.hyperledger.besu.ethereum.mainnet.feemarket.BaseFeeMarket;
 import org.hyperledger.besu.ethereum.mainnet.feemarket.FeeMarket;
@@ -19,68 +18,68 @@ public class LiquichainProtocolSpecs {
   private LiquichainProtocolSpecs() {
   }
 
-  public static ProtocolSpecBuilder frontierDefinition(final ProtocolSpecBuilder builder, final LiquichainIBFTValidator validator) {
+  public static ProtocolSpecBuilder frontierDefinition(final ProtocolSpecBuilder builder, final LiquichainIBFTValidationProvider validationProvider) {
     return builder.
         transactionValidatorBuilder(
             (gasCalculator, gasLimitCalculator) ->
-                new LiquichainIBFTTransactionValidator(validator,
+                new LiquichainIBFTTransactionValidator(validationProvider,
                     gasCalculator, gasLimitCalculator, false, Optional.empty()));
   }
 
-  public static ProtocolSpecBuilder homesteadDefinition(final ProtocolSpecBuilder builder, final LiquichainIBFTValidator validator) {
-    return frontierDefinition(builder, validator)
+  public static ProtocolSpecBuilder homesteadDefinition(final ProtocolSpecBuilder builder, final LiquichainIBFTValidationProvider validationProvider) {
+    return frontierDefinition(builder, validationProvider)
         .transactionValidatorBuilder(
             (gasCalculator, gasLimitCalculator) ->
-                new LiquichainIBFTTransactionValidator(validator,
+                new LiquichainIBFTTransactionValidator(validationProvider,
                     gasCalculator, gasLimitCalculator, true, Optional.empty()));
   }
 
-  public static ProtocolSpecBuilder daoRecoveryInitDefinition(final ProtocolSpecBuilder builder, final LiquichainIBFTValidator validator) {
-    return homesteadDefinition(builder, validator);
+  public static ProtocolSpecBuilder daoRecoveryInitDefinition(final ProtocolSpecBuilder builder, final LiquichainIBFTValidationProvider validationProvider) {
+    return homesteadDefinition(builder, validationProvider);
   }
 
-  public static ProtocolSpecBuilder daoRecoveryTransitionDefinition(final ProtocolSpecBuilder builder, final LiquichainIBFTValidator validator) {
-    return daoRecoveryInitDefinition(builder, validator);
+  public static ProtocolSpecBuilder daoRecoveryTransitionDefinition(final ProtocolSpecBuilder builder, final LiquichainIBFTValidationProvider validationProvider) {
+    return daoRecoveryInitDefinition(builder, validationProvider);
   }
 
-  public static ProtocolSpecBuilder tangerineWhistleDefinition(final ProtocolSpecBuilder builder, final LiquichainIBFTValidator validator) {
-    return homesteadDefinition(builder, validator);
+  public static ProtocolSpecBuilder tangerineWhistleDefinition(final ProtocolSpecBuilder builder, final LiquichainIBFTValidationProvider validationProvider) {
+    return homesteadDefinition(builder, validationProvider);
   }
 
-  public static ProtocolSpecBuilder spuriousDragonDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidator validator) {
+  public static ProtocolSpecBuilder spuriousDragonDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidationProvider validationProvider) {
 
-    return tangerineWhistleDefinition(builder, validator)
+    return tangerineWhistleDefinition(builder, validationProvider)
         .transactionValidatorBuilder(
             (gasCalculator, gasLimitCalculator) ->
-                new LiquichainIBFTTransactionValidator(validator, gasCalculator, gasLimitCalculator, true, chainId));
+                new LiquichainIBFTTransactionValidator(validationProvider, gasCalculator, gasLimitCalculator, true, chainId));
   }
 
-  public static ProtocolSpecBuilder byzantiumDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidator validator) {
-    return spuriousDragonDefinition(builder, chainId, validator);
+  public static ProtocolSpecBuilder byzantiumDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidationProvider validationProvider) {
+    return spuriousDragonDefinition(builder, chainId, validationProvider);
   }
 
-  public static ProtocolSpecBuilder constantinopleDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidator validator) {
-    return byzantiumDefinition(builder, chainId, validator);
+  public static ProtocolSpecBuilder constantinopleDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidationProvider validationProvider) {
+    return byzantiumDefinition(builder, chainId, validationProvider);
   }
 
-  public static ProtocolSpecBuilder petersburgDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidator validator) {
-    return constantinopleDefinition(builder, chainId, validator);
+  public static ProtocolSpecBuilder petersburgDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidationProvider validationProvider) {
+    return constantinopleDefinition(builder, chainId, validationProvider);
   }
 
-  public static ProtocolSpecBuilder istanbulDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidator validator) {
-    return petersburgDefinition(builder, chainId, validator);
+  public static ProtocolSpecBuilder istanbulDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidationProvider validationProvider) {
+    return petersburgDefinition(builder, chainId, validationProvider);
   }
 
-  public static ProtocolSpecBuilder muirGlacierDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidator validator) {
-    return istanbulDefinition(builder, chainId, validator);
+  public static ProtocolSpecBuilder muirGlacierDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidationProvider validationProvider) {
+    return istanbulDefinition(builder, chainId, validationProvider);
   }
 
-  public static ProtocolSpecBuilder berlinDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidator validator) {
-    return muirGlacierDefinition(builder, chainId, validator)
+  public static ProtocolSpecBuilder berlinDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidationProvider validationProvider) {
+    return muirGlacierDefinition(builder, chainId, validationProvider)
         .transactionValidatorBuilder(
             (gasCalculator, gasLimitCalculator) ->
                 new LiquichainIBFTTransactionValidator(
-                    validator,
+                    validationProvider,
                     gasCalculator,
                     gasLimitCalculator,
                     true,
@@ -88,12 +87,12 @@ public class LiquichainProtocolSpecs {
                     Set.of(TransactionType.FRONTIER, TransactionType.ACCESS_LIST)));
   }
 
-  public static ProtocolSpecBuilder londonDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidator validator) {
-    return berlinDefinition(builder, chainId, validator)
+  public static ProtocolSpecBuilder londonDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidationProvider validationProvider) {
+    return berlinDefinition(builder, chainId, validationProvider)
         .transactionValidatorBuilder(
             (gasCalculator, gasLimitCalculator) ->
                 new LiquichainIBFTTransactionValidator(
-                    validator,
+                    validationProvider,
                     gasCalculator,
                     gasLimitCalculator,
                     true,
@@ -104,21 +103,21 @@ public class LiquichainProtocolSpecs {
                         TransactionType.EIP1559)));
   }
 
-  public static ProtocolSpecBuilder arrowGlacierDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidator validator) {
-    return londonDefinition(builder, chainId, validator);
+  public static ProtocolSpecBuilder arrowGlacierDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidationProvider validationProvider) {
+    return londonDefinition(builder, chainId, validationProvider);
   }
 
-  public static ProtocolSpecBuilder grayGlacierDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidator validator) {
-    return arrowGlacierDefinition(builder, chainId, validator);
+  public static ProtocolSpecBuilder grayGlacierDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidationProvider validationProvider) {
+    return arrowGlacierDefinition(builder, chainId, validationProvider);
   }
 
-  public static ProtocolSpecBuilder parisDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidator validator) {
-    return grayGlacierDefinition(builder, chainId, validator);
+  public static ProtocolSpecBuilder parisDefinition(final ProtocolSpecBuilder builder, final Optional<BigInteger> chainId, final LiquichainIBFTValidationProvider validationProvider) {
+    return grayGlacierDefinition(builder, chainId, validationProvider);
   }
 
   public static ProtocolSpecBuilder shanghaiDefinition(final ProtocolSpecBuilder builder,
                                                        final Optional<BigInteger> chainId,
-                                                       final LiquichainIBFTValidator validator,
+                                                       final LiquichainIBFTValidationProvider validationProvider,
                                                        final GenesisConfigOptions genesisConfigOptions) {
 
     final long londonForkBlockNumber = genesisConfigOptions.getLondonBlockNumber().orElse(0L);
@@ -127,11 +126,11 @@ public class LiquichainProtocolSpecs {
             ? FeeMarket.zeroBaseFee(londonForkBlockNumber)
             : FeeMarket.london(londonForkBlockNumber, genesisConfigOptions.getBaseFeePerGas());
 
-    return parisDefinition(builder, chainId, validator)
+    return parisDefinition(builder, chainId, validationProvider)
         .transactionValidatorBuilder(
             (gasCalculator, gasLimitCalculator) ->
                 new LiquichainIBFTTransactionValidator(
-                    validator,
+                    validationProvider,
                     gasCalculator,
                     gasLimitCalculator,
                     londonFeeMarket,
@@ -146,17 +145,17 @@ public class LiquichainProtocolSpecs {
 
   public static ProtocolSpecBuilder cancunDefinition(final ProtocolSpecBuilder builder,
                                                      final Optional<BigInteger> chainId,
-                                                     final LiquichainIBFTValidator validator,
+                                                     final LiquichainIBFTValidationProvider validationProvider,
                                                      final GenesisConfigOptions genesisConfigOptions) {
     final long londonForkBlockNumber = genesisConfigOptions.getLondonBlockNumber().orElse(0L);
     final BaseFeeMarket cancunFeeMarket =
         genesisConfigOptions.isZeroBaseFee()
             ? FeeMarket.zeroBaseFee(londonForkBlockNumber)
             : FeeMarket.cancun(londonForkBlockNumber, genesisConfigOptions.getBaseFeePerGas());
-    return shanghaiDefinition(builder, chainId, validator, genesisConfigOptions).transactionValidatorBuilder(
+    return shanghaiDefinition(builder, chainId, validationProvider, genesisConfigOptions).transactionValidatorBuilder(
         (gasCalculator, gasLimitCalculator) ->
             new LiquichainIBFTTransactionValidator(
-                validator,
+                validationProvider,
                 gasCalculator,
                 gasLimitCalculator,
                 cancunFeeMarket,
@@ -172,31 +171,31 @@ public class LiquichainProtocolSpecs {
 
   public static ProtocolSpecBuilder futureEipsDefinition(final ProtocolSpecBuilder builder,
                                                          final Optional<BigInteger> chainId,
-                                                         final LiquichainIBFTValidator validator,
+                                                         final LiquichainIBFTValidationProvider validationProvider,
                                                          final GenesisConfigOptions genesisConfigOptions) {
-    return cancunDefinition(builder, chainId, validator, genesisConfigOptions);
+    return cancunDefinition(builder, chainId, validationProvider, genesisConfigOptions);
   }
 
   public static ProtocolSpecBuilder experimentalEipsDefinition(final ProtocolSpecBuilder builder,
                                                                final Optional<BigInteger> chainId,
-                                                               final LiquichainIBFTValidator validator,
+                                                               final LiquichainIBFTValidationProvider validationProvider,
                                                                final GenesisConfigOptions genesisConfigOptions) {
-    return futureEipsDefinition(builder, chainId, validator, genesisConfigOptions);
+    return futureEipsDefinition(builder, chainId, validationProvider, genesisConfigOptions);
   }
 
   public static ProtocolSpecBuilder classicRecoveryInitDefinition(
       final ProtocolSpecBuilder builder,
-      final LiquichainIBFTValidator validator) {
-    return homesteadDefinition(builder, validator);
+      final LiquichainIBFTValidationProvider validationProvider) {
+    return homesteadDefinition(builder, validationProvider);
   }
 
   public static ProtocolSpecBuilder classicTangerineWhistleDefinition(final ProtocolSpecBuilder builder,
                                                                       final Optional<BigInteger> chainId,
-                                                                      final LiquichainIBFTValidator validator) {
-    return homesteadDefinition(builder, validator)
+                                                                      final LiquichainIBFTValidationProvider validationProvider) {
+    return homesteadDefinition(builder, validationProvider)
         .transactionValidatorBuilder(
             (gasCalculator, gasLimitCalculator) ->
-                new LiquichainIBFTTransactionValidator(validator,
+                new LiquichainIBFTTransactionValidator(validationProvider,
                     gasCalculator,
                     gasLimitCalculator, true,
                     chainId));
@@ -205,61 +204,61 @@ public class LiquichainProtocolSpecs {
   public static ProtocolSpecBuilder classicDieHardDefinition(
       final ProtocolSpecBuilder builder,
       final Optional<BigInteger> chainId,
-      final LiquichainIBFTValidator validator) {
-    return classicTangerineWhistleDefinition(builder, chainId, validator);
+      final LiquichainIBFTValidationProvider validationProvider) {
+    return classicTangerineWhistleDefinition(builder, chainId, validationProvider);
   }
 
   public static ProtocolSpecBuilder classicGothamDefinition(
       final ProtocolSpecBuilder builder,
       final Optional<BigInteger> chainId,
-      final LiquichainIBFTValidator validator) {
-    return classicDieHardDefinition(builder, chainId, validator);
+      final LiquichainIBFTValidationProvider validationProvider) {
+    return classicDieHardDefinition(builder, chainId, validationProvider);
   }
 
   public static ProtocolSpecBuilder classicDefuseDifficultyBombDefinition(
       final ProtocolSpecBuilder builder,
       final Optional<BigInteger> chainId,
-      final LiquichainIBFTValidator validator) {
-    return classicGothamDefinition(builder, chainId, validator);
+      final LiquichainIBFTValidationProvider validationProvider) {
+    return classicGothamDefinition(builder, chainId, validationProvider);
   }
 
   public static ProtocolSpecBuilder classicAtlantisDefinition(
       final ProtocolSpecBuilder builder,
       final Optional<BigInteger> chainId,
-      final LiquichainIBFTValidator validator) {
-    return classicGothamDefinition(builder, chainId, validator);
+      final LiquichainIBFTValidationProvider validationProvider) {
+    return classicGothamDefinition(builder, chainId, validationProvider);
   }
 
   public static ProtocolSpecBuilder classicAghartaDefinition(
       final ProtocolSpecBuilder builder,
       final Optional<BigInteger> chainId,
-      final LiquichainIBFTValidator validator) {
-    return classicAtlantisDefinition(builder, chainId, validator);
+      final LiquichainIBFTValidationProvider validationProvider) {
+    return classicAtlantisDefinition(builder, chainId, validationProvider);
   }
 
   public static ProtocolSpecBuilder classicPhoenixDefinition(
       final ProtocolSpecBuilder builder,
       final Optional<BigInteger> chainId,
-      final LiquichainIBFTValidator validator) {
-    return classicAghartaDefinition(builder, chainId, validator);
+      final LiquichainIBFTValidationProvider validationProvider) {
+    return classicAghartaDefinition(builder, chainId, validationProvider);
   }
 
   public static ProtocolSpecBuilder classicThanosDefinition(
       final ProtocolSpecBuilder builder,
       final Optional<BigInteger> chainId,
-      final LiquichainIBFTValidator validator) {
-    return classicPhoenixDefinition(builder, chainId, validator);
+      final LiquichainIBFTValidationProvider validationProvider) {
+    return classicPhoenixDefinition(builder, chainId, validationProvider);
   }
 
   public static ProtocolSpecBuilder classicMagnetoDefinition(
       final ProtocolSpecBuilder builder,
       final Optional<BigInteger> chainId,
-      final LiquichainIBFTValidator validator) {
-    return classicThanosDefinition(builder, chainId, validator)
+      final LiquichainIBFTValidationProvider validationProvider) {
+    return classicThanosDefinition(builder, chainId, validationProvider)
         .transactionValidatorBuilder(
             (gasCalculator, gasLimitCalculator) ->
                 new LiquichainIBFTTransactionValidator(
-                    validator,
+                    validationProvider,
                     gasCalculator,
                     gasLimitCalculator,
                     true,
@@ -270,7 +269,7 @@ public class LiquichainProtocolSpecs {
   public static ProtocolSpecBuilder classicMystiqueDefinition(
       final ProtocolSpecBuilder builder,
       final Optional<BigInteger> chainId,
-      final LiquichainIBFTValidator validator) {
-    return classicMagnetoDefinition(builder, chainId, validator);
+      final LiquichainIBFTValidationProvider validationProvider) {
+    return classicMagnetoDefinition(builder, chainId, validationProvider);
   }
 }

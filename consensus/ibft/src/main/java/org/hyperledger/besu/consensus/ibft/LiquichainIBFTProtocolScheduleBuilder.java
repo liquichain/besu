@@ -6,7 +6,6 @@ import org.hyperledger.besu.consensus.common.ForksSchedule;
 import org.hyperledger.besu.consensus.common.bft.BftBlockHeaderFunctions;
 import org.hyperledger.besu.consensus.common.bft.BftExtraDataCodec;
 import org.hyperledger.besu.consensus.common.bft.BftProtocolSchedule;
-import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.core.PrivacyParameters;
 import org.hyperledger.besu.ethereum.mainnet.DefaultProtocolSchedule;
@@ -47,7 +46,7 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
       final boolean isRevertReasonEnabled,
       final BftExtraDataCodec bftExtraDataCodec,
       final EvmConfiguration evmConfiguration,
-      final LiquichainIBFTValidator validator) {
+      final LiquichainIBFTValidationProvider validationProvider) {
     return new LiquichainIBFTProtocolScheduleBuilder()
         .createProtocolSchedule(
             config,
@@ -56,7 +55,7 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
             isRevertReasonEnabled,
             bftExtraDataCodec,
             evmConfiguration,
-            validator);
+            validationProvider);
   }
 
   /**
@@ -73,7 +72,7 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
       final ForksSchedule<BftConfigOptions> forksSchedule,
       final BftExtraDataCodec bftExtraDataCodec,
       final EvmConfiguration evmConfiguration,
-      final LiquichainIBFTValidator validator
+      final LiquichainIBFTValidationProvider validationProvider
   ) {
     return create(
         config,
@@ -82,7 +81,7 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
         false,
         bftExtraDataCodec,
         evmConfiguration,
-        validator);
+        validationProvider);
   }
 
   public BftProtocolSchedule createProtocolSchedule(final GenesisConfigOptions config,
@@ -91,9 +90,9 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
                                                     final boolean isRevertReasonEnabled,
                                                     final BftExtraDataCodec bftExtraDataCodec,
                                                     final EvmConfiguration evmConfiguration,
-                                                    final LiquichainIBFTValidator validator) {
+                                                    final LiquichainIBFTValidationProvider validationProvider) {
     final Map<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> specMap = new HashMap<>();
-    final TreeMap<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> milestones = createMilestones(config, validator);
+    final TreeMap<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> milestones = createMilestones(config, validationProvider);
 
     forksSchedule
         .getForks()
@@ -173,43 +172,43 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
   }
 
   private TreeMap<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> createMilestones(final GenesisConfigOptions config,
-                                                                                             final LiquichainIBFTValidator validator) {
+                                                                                             final LiquichainIBFTValidationProvider validationProvider) {
 
     TreeMap<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> milestones = new TreeMap<>();
 
-    putMilestone(milestones, OptionalLong.of(0), builder -> LiquichainProtocolSpecs.frontierDefinition(builder, validator));
-    putMilestone(milestones, config.getHomesteadBlockNumber(), builder -> LiquichainProtocolSpecs.homesteadDefinition(builder, validator));
-    putMilestone(milestones, config.getTangerineWhistleBlockNumber(), builder -> LiquichainProtocolSpecs.tangerineWhistleDefinition(builder, validator));
+    putMilestone(milestones, OptionalLong.of(0), builder -> LiquichainProtocolSpecs.frontierDefinition(builder, validationProvider));
+    putMilestone(milestones, config.getHomesteadBlockNumber(), builder -> LiquichainProtocolSpecs.homesteadDefinition(builder, validationProvider));
+    putMilestone(milestones, config.getTangerineWhistleBlockNumber(), builder -> LiquichainProtocolSpecs.tangerineWhistleDefinition(builder, validationProvider));
 
 
-    putMilestone(milestones, config.getSpuriousDragonBlockNumber(), builder -> LiquichainProtocolSpecs.spuriousDragonDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getByzantiumBlockNumber(), builder -> LiquichainProtocolSpecs.byzantiumDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getConstantinopleBlockNumber(), builder -> LiquichainProtocolSpecs.constantinopleDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getPetersburgBlockNumber(), builder -> LiquichainProtocolSpecs.petersburgDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getIstanbulBlockNumber(), builder -> LiquichainProtocolSpecs.istanbulDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getMuirGlacierBlockNumber(), builder -> LiquichainProtocolSpecs.muirGlacierDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getBerlinBlockNumber(), builder -> LiquichainProtocolSpecs.berlinDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getLondonBlockNumber(), builder -> LiquichainProtocolSpecs.londonDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getArrowGlacierBlockNumber(), builder -> LiquichainProtocolSpecs.arrowGlacierDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getGrayGlacierBlockNumber(), builder -> LiquichainProtocolSpecs.grayGlacierDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getMergeNetSplitBlockNumber(), builder -> LiquichainProtocolSpecs.parisDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getSpuriousDragonBlockNumber(), builder -> LiquichainProtocolSpecs.spuriousDragonDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getByzantiumBlockNumber(), builder -> LiquichainProtocolSpecs.byzantiumDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getConstantinopleBlockNumber(), builder -> LiquichainProtocolSpecs.constantinopleDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getPetersburgBlockNumber(), builder -> LiquichainProtocolSpecs.petersburgDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getIstanbulBlockNumber(), builder -> LiquichainProtocolSpecs.istanbulDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getMuirGlacierBlockNumber(), builder -> LiquichainProtocolSpecs.muirGlacierDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getBerlinBlockNumber(), builder -> LiquichainProtocolSpecs.berlinDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getLondonBlockNumber(), builder -> LiquichainProtocolSpecs.londonDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getArrowGlacierBlockNumber(), builder -> LiquichainProtocolSpecs.arrowGlacierDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getGrayGlacierBlockNumber(), builder -> LiquichainProtocolSpecs.grayGlacierDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getMergeNetSplitBlockNumber(), builder -> LiquichainProtocolSpecs.parisDefinition(builder, config.getChainId(), validationProvider));
     // Timestamp Forks
-    putMilestone(milestones, config.getShanghaiTime(), builder -> LiquichainProtocolSpecs.shanghaiDefinition(builder, config.getChainId(), validator, config));
-    putMilestone(milestones, config.getCancunTime(), builder -> LiquichainProtocolSpecs.cancunDefinition(builder, config.getChainId(), validator, config));
-    putMilestone(milestones, config.getFutureEipsTime(), builder -> LiquichainProtocolSpecs.futureEipsDefinition(builder, config.getChainId(), validator, config));
-    putMilestone(milestones, config.getExperimentalEipsTime(), builder -> LiquichainProtocolSpecs.experimentalEipsDefinition(builder, config.getChainId(), validator, config));
+    putMilestone(milestones, config.getShanghaiTime(), builder -> LiquichainProtocolSpecs.shanghaiDefinition(builder, config.getChainId(), validationProvider, config));
+    putMilestone(milestones, config.getCancunTime(), builder -> LiquichainProtocolSpecs.cancunDefinition(builder, config.getChainId(), validationProvider, config));
+    putMilestone(milestones, config.getFutureEipsTime(), builder -> LiquichainProtocolSpecs.futureEipsDefinition(builder, config.getChainId(), validationProvider, config));
+    putMilestone(milestones, config.getExperimentalEipsTime(), builder -> LiquichainProtocolSpecs.experimentalEipsDefinition(builder, config.getChainId(), validationProvider, config));
 
     // Classic Milestones
-    putMilestone(milestones, config.getEcip1015BlockNumber(), builder -> LiquichainProtocolSpecs.classicTangerineWhistleDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getDieHardBlockNumber(), builder -> LiquichainProtocolSpecs.classicDieHardDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getGothamBlockNumber(), builder -> LiquichainProtocolSpecs.classicGothamDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getDefuseDifficultyBombBlockNumber(), builder -> LiquichainProtocolSpecs.classicDefuseDifficultyBombDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getAtlantisBlockNumber(), builder -> LiquichainProtocolSpecs.classicAtlantisDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getAghartaBlockNumber(), builder -> LiquichainProtocolSpecs.classicAghartaDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getPhoenixBlockNumber(), builder -> LiquichainProtocolSpecs.classicPhoenixDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getThanosBlockNumber(), builder -> LiquichainProtocolSpecs.classicThanosDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getMagnetoBlockNumber(), builder -> LiquichainProtocolSpecs.classicMagnetoDefinition(builder, config.getChainId(), validator));
-    putMilestone(milestones, config.getMystiqueBlockNumber(), builder -> LiquichainProtocolSpecs.classicMystiqueDefinition(builder, config.getChainId(), validator));
+    putMilestone(milestones, config.getEcip1015BlockNumber(), builder -> LiquichainProtocolSpecs.classicTangerineWhistleDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getDieHardBlockNumber(), builder -> LiquichainProtocolSpecs.classicDieHardDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getGothamBlockNumber(), builder -> LiquichainProtocolSpecs.classicGothamDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getDefuseDifficultyBombBlockNumber(), builder -> LiquichainProtocolSpecs.classicDefuseDifficultyBombDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getAtlantisBlockNumber(), builder -> LiquichainProtocolSpecs.classicAtlantisDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getAghartaBlockNumber(), builder -> LiquichainProtocolSpecs.classicAghartaDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getPhoenixBlockNumber(), builder -> LiquichainProtocolSpecs.classicPhoenixDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getThanosBlockNumber(), builder -> LiquichainProtocolSpecs.classicThanosDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getMagnetoBlockNumber(), builder -> LiquichainProtocolSpecs.classicMagnetoDefinition(builder, config.getChainId(), validationProvider));
+    putMilestone(milestones, config.getMystiqueBlockNumber(), builder -> LiquichainProtocolSpecs.classicMystiqueDefinition(builder, config.getChainId(), validationProvider));
 
     return milestones;
   }

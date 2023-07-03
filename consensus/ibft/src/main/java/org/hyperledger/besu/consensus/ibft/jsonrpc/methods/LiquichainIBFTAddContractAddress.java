@@ -1,8 +1,7 @@
 package org.hyperledger.besu.consensus.ibft.jsonrpc.methods;
 
 import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
-import org.hyperledger.besu.consensus.ibft.validation.LiquichainIBFTValidator;
-import org.hyperledger.besu.datatypes.Address;
+import org.hyperledger.besu.consensus.ibft.LiquichainIBFTValidationProvider;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequestContext;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
@@ -13,10 +12,10 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSucces
 
 public class LiquichainIBFTAddContractAddress implements JsonRpcMethod {
 
-  private final LiquichainIBFTValidator validator;
+  private final LiquichainIBFTValidationProvider validationProvider;
 
-  public LiquichainIBFTAddContractAddress(final LiquichainIBFTValidator validator) {
-    this.validator = validator;
+  public LiquichainIBFTAddContractAddress(final LiquichainIBFTValidationProvider validationProvider) {
+    this.validationProvider = validationProvider;
   }
 
   @Override
@@ -34,9 +33,9 @@ public class LiquichainIBFTAddContractAddress implements JsonRpcMethod {
       return new JsonRpcErrorResponse(requestContext.getRequest().getId(), JsonRpcError.INVALID_LIST_TYPE);
     }
     if (type.equals(LiquichainIBFTAllowListType.WHITE_LIST)) {
-      validator.updateSmartContractBlackList(contractAddress, add);
+      validationProvider.updateSmartContractBlackList(contractAddress, add);
     } else if (type.equals(LiquichainIBFTAllowListType.BLACK_LIST)) {
-      validator.updateSmartContractWhiteList(contractAddress, add);
+      validationProvider.updateSmartContractWhiteList(contractAddress, add);
     }
     return new JsonRpcSuccessResponse(requestContext.getRequest().getId(), true);
   }

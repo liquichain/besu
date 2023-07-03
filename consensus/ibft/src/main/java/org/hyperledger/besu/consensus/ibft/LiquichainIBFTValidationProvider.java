@@ -1,4 +1,4 @@
-package org.hyperledger.besu.consensus.ibft.validation;
+package org.hyperledger.besu.consensus.ibft;
 
 import org.hyperledger.besu.config.LiquichainIBFTConfigOptions;
 import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class LiquichainIBFTValidator {
+public class LiquichainIBFTValidationProvider {
   private final List<String> whiteList;
   private final List<String> blackList;
   private final Map<String, List<String>> peersWhiteList;
@@ -22,9 +22,9 @@ public class LiquichainIBFTValidator {
 
   private EthContext ethContext;
 
-  private static final Logger LOG = LoggerFactory.getLogger(LiquichainIBFTValidator.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LiquichainIBFTValidationProvider.class);
 
-  public LiquichainIBFTValidator(final LiquichainIBFTConfigOptions ibftConfigOptions) {
+  public LiquichainIBFTValidationProvider(final LiquichainIBFTConfigOptions ibftConfigOptions) {
     whiteList = ibftConfigOptions.getSmartContractWhiteList();
     blackList = ibftConfigOptions.getSmartContractBlackList();
 
