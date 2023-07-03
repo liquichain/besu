@@ -2,17 +2,19 @@ package org.hyperledger.besu.consensus.ibft;
 
 import org.hyperledger.besu.config.LiquichainIBFTConfigOptions;
 import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
-import org.hyperledger.besu.consensus.ibft.messagedata.LiquichainIBFTContractAddressListMessageData;
-import org.hyperledger.besu.consensus.ibft.protocol.LiquichainIBFTSubProtocol;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
+import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
+import org.hyperledger.besu.ethereum.transaction.TransactionInvalidReason;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class LiquichainIBFTValidationProvider {
   private final List<String> whiteList;
@@ -87,7 +89,39 @@ public class LiquichainIBFTValidationProvider {
     } catch (PeerConnection.PeerNotConnected e) {
       throw new RuntimeException(e);
     }
+  }
 
+  public List<String> getSmartContracListByPeer(final EthPeer peer, final LiquichainIBFTAllowListType type) {
+    return switch (type) {
+      case WHITE_LIST -> peersWhiteList.getOrDefault(peer.getId().toString(), new ArrayList<>());
+      case BLACK_LIST -> peersBlackList.getOrDefault(peer.getId().toString(), new ArrayList<>());
+    };
+  }
+
+  public boolean validateBySmartContractList(final String contractAddress,
+                                             final Optional<EthPeer> peer) {
+    List<String> whiteList;
+    List<String> blackList;
+    if (peer.isEmpty()) {
+      whiteList = this.whiteList;
+      blackList = this.blackList;
+    } else {
+      whiteList = getSmartContracListByPeer(peer.get(), LiquichainIBFTAllowListType.WHITE_LIST);
+      blackList = getSmartContracListByPeer(peer.get(), LiquichainIBFTAllowListType.BLACK_LIST);
+
+    }
+
+    if (whiteList != null && !whiteList.isEmpty()) {
+      final Optional<String> matchAddress = whiteList.stream().filter(address -> address.equals(contractAddress)).findAny();
+      return matchAddress.isEmpty();
+    }
+
+    if (blackList != null && !blackList.isEmpty()) {
+      final Optional<String> matchAddress = blackList.stream().filter(address -> address.equals(contractAddress)).findAny();
+      return matchAddress.isEmpty();
+    }
+
+    return true;
   }
 
 }

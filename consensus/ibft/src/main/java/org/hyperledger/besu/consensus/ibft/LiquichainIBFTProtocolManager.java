@@ -2,7 +2,6 @@ package org.hyperledger.besu.consensus.ibft;
 
 import org.apache.tuweni.bytes.Bytes;
 import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
-import org.hyperledger.besu.consensus.ibft.messagedata.LiquichainIBFTContractAddressListMessageData;
 import org.hyperledger.besu.ethereum.p2p.network.ProtocolManager;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;

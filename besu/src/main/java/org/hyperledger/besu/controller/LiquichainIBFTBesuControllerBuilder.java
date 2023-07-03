@@ -52,13 +52,14 @@ import org.hyperledger.besu.consensus.ibft.IbftGossip;
 import org.hyperledger.besu.consensus.ibft.jsonrpc.LiquichainIBFTJsonRpcMethods;
 import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
 import org.hyperledger.besu.consensus.ibft.protocol.IbftSubProtocol;
-import org.hyperledger.besu.consensus.ibft.protocol.LiquichainIBFTSubProtocol;
+import org.hyperledger.besu.consensus.ibft.LiquichainIBFTSubProtocol;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftBlockHeightManagerFactory;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftController;
 import org.hyperledger.besu.consensus.ibft.statemachine.IbftRoundFactory;
 import org.hyperledger.besu.consensus.ibft.LiquichainIBFTValidationProvider;
 import org.hyperledger.besu.consensus.ibft.validation.MessageValidatorFactory;
 import org.hyperledger.besu.datatypes.Address;
+import org.hyperledger.besu.ethereum.ConsensusContextFactory;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.api.jsonrpc.methods.JsonRpcMethods;
 import org.hyperledger.besu.ethereum.blockcreation.MiningCoordinator;
@@ -77,6 +78,7 @@ import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.p2p.config.SubProtocolConfiguration;
 import org.hyperledger.besu.ethereum.worldstate.WorldStateArchive;
+import org.hyperledger.besu.plugin.services.txselection.TransactionSelectorFactory;
 import org.hyperledger.besu.util.Subscribers;
 
 import java.util.HashMap;
@@ -281,6 +283,11 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
     if (bftBlockInterface().get().validatorsInBlock(genesisBlockHeader).isEmpty()) {
       LOG.warn("Genesis block contains no signers - chain will not progress.");
     }
+  }
+
+  @Override
+  protected ProtocolContext createProtocolContext(MutableBlockchain blockchain, WorldStateArchive worldStateArchive, ProtocolSchedule protocolSchedule, ConsensusContextFactory consensusContextFactory, Optional<TransactionSelectorFactory> transactionSelectorFactory) {
+    return super.createProtocolContext(blockchain, worldStateArchive, protocolSchedule, consensusContextFactory, transactionSelectorFactory);
   }
 
   @Override

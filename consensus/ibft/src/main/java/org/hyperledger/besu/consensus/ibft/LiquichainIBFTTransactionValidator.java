@@ -88,22 +88,9 @@ public class LiquichainIBFTTransactionValidator extends MainnetTransactionValida
 
 
   public ValidationResult<TransactionInvalidReason> validateContractAddress(final Address contractAddress) {
-    List<String> whiteList = validationProvider.getSmartContractWhiteList();
-    if (whiteList != null && !whiteList.isEmpty()) {
-      final Optional<String> matchAddress = whiteList.stream().filter(address -> address.equals(contractAddress.toString())).findAny();
-      if (matchAddress.isEmpty()) {
-        ValidationResult<TransactionInvalidReason> result = ValidationResult.invalid(TransactionInvalidReason.INVALID_CONTRACT_ADDRESS, "Contract address does not appear in allow list");
-        return result;
-      }
-    }
-
-    List<String> blackList = validationProvider.getSmartContractBlackList();
-    if (blackList != null && !blackList.isEmpty()) {
-      final Optional<String> matchAddress = blackList.stream().filter(address -> address.equals(contractAddress.toString())).findAny();
-      if (matchAddress.isPresent()) {
-        ValidationResult<TransactionInvalidReason> result = ValidationResult.invalid(TransactionInvalidReason.INVALID_CONTRACT_ADDRESS, "Contract address does not appear in allow list");
-        return result;
-      }
+    if (!validationProvider.validateBySmartContractList(contractAddress.toString(), Optional.empty())) {
+      ValidationResult<TransactionInvalidReason> result = ValidationResult.invalid(TransactionInvalidReason.INVALID_CONTRACT_ADDRESS, "Contract address does not appear in allow list");
+      return result;
     }
     return ValidationResult.valid();
   }
