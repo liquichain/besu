@@ -2,17 +2,13 @@ package org.hyperledger.besu.ethereum.eth.transactions;
 
 import org.hyperledger.besu.consensus.ibft.LiquichainIBFTTransactionContext;
 import org.hyperledger.besu.consensus.ibft.LiquichainIBFTValidationProvider;
-import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.chain.MutableBlockchain;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.Transaction;
-import static org.hyperledger.besu.ethereum.core.Transaction.toHashList;
 import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.manager.EthPeer;
 import org.hyperledger.besu.ethereum.eth.messages.EthPV65;
-import org.hyperledger.besu.ethereum.eth.messages.LimitedTransactionsMessages;
-import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.evm.account.Account;
 import org.hyperledger.besu.evm.worldstate.WorldState;
 import org.hyperledger.besu.plugin.data.TransactionType;
@@ -27,13 +23,12 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 public class LiquichainIBFTTransactionBroadcaster extends TransactionBroadcaster {
   private static final Logger LOG = LoggerFactory.getLogger(LiquichainIBFTTransactionBroadcaster.class);
 
-  private LiquichainIBFTValidationProvider validationProvider;
+  private final LiquichainIBFTValidationProvider validationProvider;
   private final PeerTransactionTracker transactionTracker;
 
   private final ProtocolContext protocolContext;

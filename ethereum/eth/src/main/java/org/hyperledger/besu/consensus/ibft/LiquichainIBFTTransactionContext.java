@@ -10,9 +10,10 @@ public class LiquichainIBFTTransactionContext implements ConsensusContext {
   }
 
   @Override
-  public <C extends ConsensusContext> C as(Class<C> klass) {
+  public <C extends ConsensusContext> C as(final Class<C> klass) {
     return klass.cast(this);
   }
+
   public LiquichainIBFTValidationProvider getValidationProvider() {
     return this.validationProvider;
   }

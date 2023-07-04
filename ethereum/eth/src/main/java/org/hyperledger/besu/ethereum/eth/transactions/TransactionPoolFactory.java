@@ -99,7 +99,8 @@ public class TransactionPoolFactory {
             pendingTransactions,
             protocolSchedule,
             protocolContext,
-            new TransactionBroadcaster(
+            new LiquichainIBFTTransactionBroadcaster(
+                protocolContext,
                 ethContext,
                 pendingTransactions,
                 transactionTracker,
