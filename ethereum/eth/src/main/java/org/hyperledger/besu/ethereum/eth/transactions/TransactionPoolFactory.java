@@ -101,7 +101,8 @@ public class TransactionPoolFactory {
                     transactionPoolConfiguration),
             protocolSchedule,
             protocolContext,
-            new TransactionBroadcaster(
+            new LiquichainIBFTTransactionBroadcaster(
+                protocolContext,
                 ethContext,
                 transactionTracker,
                 transactionsMessageSender,

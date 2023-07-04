@@ -43,12 +43,14 @@ import org.hyperledger.besu.consensus.common.bft.statemachine.BftFinalState;
 import org.hyperledger.besu.consensus.common.bft.statemachine.FutureMessageBuffer;
 import org.hyperledger.besu.consensus.common.validator.ValidatorProvider;
 import org.hyperledger.besu.consensus.common.validator.blockbased.BlockValidatorProvider;
+import org.hyperledger.besu.consensus.ibft.LiquichainContext;
 import org.hyperledger.besu.consensus.ibft.LiquichainIBFTContext;
 import org.hyperledger.besu.consensus.ibft.LiquichainIBFTProtocolManager;
 import org.hyperledger.besu.consensus.ibft.LiquichainIBFTProtocolScheduleBuilder;
 import org.hyperledger.besu.consensus.ibft.IbftExtraDataCodec;
 import org.hyperledger.besu.consensus.ibft.IbftForksSchedulesFactory;
 import org.hyperledger.besu.consensus.ibft.IbftGossip;
+import org.hyperledger.besu.consensus.ibft.LiquichainIBFTTransactionContext;
 import org.hyperledger.besu.consensus.ibft.jsonrpc.LiquichainIBFTJsonRpcMethods;
 import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
 import org.hyperledger.besu.consensus.ibft.protocol.IbftSubProtocol;
@@ -59,6 +61,7 @@ import org.hyperledger.besu.consensus.ibft.statemachine.IbftRoundFactory;
 import org.hyperledger.besu.consensus.ibft.LiquichainIBFTValidationProvider;
 import org.hyperledger.besu.consensus.ibft.validation.MessageValidatorFactory;
 import org.hyperledger.besu.datatypes.Address;
+import org.hyperledger.besu.ethereum.ConsensusContext;
 import org.hyperledger.besu.ethereum.ConsensusContextFactory;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.api.jsonrpc.methods.JsonRpcMethods;
@@ -286,12 +289,7 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
   }
 
   @Override
-  protected ProtocolContext createProtocolContext(MutableBlockchain blockchain, WorldStateArchive worldStateArchive, ProtocolSchedule protocolSchedule, ConsensusContextFactory consensusContextFactory, Optional<TransactionSelectorFactory> transactionSelectorFactory) {
-    return super.createProtocolContext(blockchain, worldStateArchive, protocolSchedule, consensusContextFactory, transactionSelectorFactory);
-  }
-
-  @Override
-  protected BftContext createConsensusContext(
+  protected ConsensusContext createConsensusContext(
       final Blockchain blockchain,
       final WorldStateArchive worldStateArchive,
       final ProtocolSchedule protocolSchedule) {
@@ -302,12 +300,14 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
     final BftValidatorOverrides validatorOverrides =
         convertIbftForks(configOptions.getTransitions().getIbftForks());
 
-    return new LiquichainIBFTContext(
+    final LiquichainIBFTContext ibftContext = new LiquichainIBFTContext(
         validationProvider,
         BlockValidatorProvider.forkingValidatorProvider(
             blockchain, epochManager, bftBlockInterface().get(), validatorOverrides),
         epochManager,
         bftBlockInterface().get());
+    final LiquichainIBFTTransactionContext transactionContext = new LiquichainIBFTTransactionContext(validationProvider);
+    return new LiquichainContext(ibftContext, transactionContext);
   }
 
   private BftValidatorOverrides convertIbftForks(final List<BftFork> bftForks) {
