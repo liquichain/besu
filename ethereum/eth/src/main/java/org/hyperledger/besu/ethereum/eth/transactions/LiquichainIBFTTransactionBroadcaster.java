@@ -56,6 +56,7 @@ public class LiquichainIBFTTransactionBroadcaster extends TransactionBroadcaster
     this.transactionTracker = transactionTracker;
     this.protocolContext = protocolContext;
     this.validationProvider = protocolContext.getConsensusContext(LiquichainIBFTTransactionContext.class).getValidationProvider();
+    LOG.info("ValidationProvider " + validationProvider);
   }
 
 
