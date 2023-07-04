@@ -112,13 +112,18 @@ public class LiquichainIBFTValidationProvider {
 
     }
 
+    LOG.info("Whitelist " + whiteList);
+    LOG.info("Blacklist " + blackList);
+
     if (whiteList != null && !whiteList.isEmpty()) {
       final Optional<String> matchAddress = whiteList.stream().filter(address -> address.equals(contractAddress)).findAny();
-      return matchAddress.isEmpty();
+      LOG.info("Whitelist Is Present " + matchAddress.isPresent());
+      return matchAddress.isPresent();
     }
 
     if (blackList != null && !blackList.isEmpty()) {
       final Optional<String> matchAddress = blackList.stream().filter(address -> address.equals(contractAddress)).findAny();
+      LOG.info("Blacklist is Present " + matchAddress.isEmpty());
       return matchAddress.isEmpty();
     }
 

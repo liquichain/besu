@@ -164,7 +164,11 @@ public class LiquichainIBFTTransactionBroadcaster extends TransactionBroadcaster
           peer -> {
             transactions.forEach(
                 transaction -> {
-                  if (isTransactionAllowedToSend(peer, transaction)) {
+                  var isAllowed = isTransactionAllowedToSend(peer, transaction);
+                  LOG.atInfo().setMessage("Peer {}, Is Allowed To Send Trasaction {}")
+                      .addArgument(peer.getId())
+                      .addArgument(isAllowed).log();
+                  if (isAllowed) {
                     transactionTracker.addToPeerSendQueue(peer, transaction);
                   }
                 });
@@ -184,7 +188,11 @@ public class LiquichainIBFTTransactionBroadcaster extends TransactionBroadcaster
               peer -> {
                 transactions.forEach(
                     transaction -> {
-                      if (isTransactionAllowedToSend(peer, transaction)) {
+                      var isAllowed = isTransactionAllowedToSend(peer, transaction);
+                      LOG.atInfo().setMessage("Peer {}, Is Allowed To Send Trasaction {}")
+                          .addArgument(peer.getId())
+                          .addArgument(isAllowed).log();
+                      if (isAllowed) {
                         transactionTracker.addToPeerSendQueue(peer, transaction);
                       }
                     });

@@ -32,9 +32,9 @@ public class LiquichainIBFTAddContractAddress implements JsonRpcMethod {
     if (type == null) {
       return new JsonRpcErrorResponse(requestContext.getRequest().getId(), JsonRpcError.INVALID_LIST_TYPE);
     }
-    if (type.equals(LiquichainIBFTAllowListType.WHITE_LIST)) {
+    if (type.equals(LiquichainIBFTAllowListType.BLACK_LIST)) {
       validationProvider.updateSmartContractBlackList(contractAddress, add);
-    } else if (type.equals(LiquichainIBFTAllowListType.BLACK_LIST)) {
+    } else if (type.equals(LiquichainIBFTAllowListType.WHITE_LIST)) {
       validationProvider.updateSmartContractWhiteList(contractAddress, add);
     }
     return new JsonRpcSuccessResponse(requestContext.getRequest().getId(), true);
