@@ -58,6 +58,7 @@ public class LiquichainIBFTValidationProvider {
         whiteList.remove(address);
       }
     }
+    sendListOnUpdate(LiquichainIBFTAllowListType.WHITE_LIST);
   }
 
   public void updateSmartContractBlackList(final String address, final Boolean add) {
@@ -71,6 +72,7 @@ public class LiquichainIBFTValidationProvider {
         blackList.remove(address);
       }
     }
+    sendListOnUpdate(LiquichainIBFTAllowListType.BLACK_LIST);
   }
 
   public void updatePeerContractAddressList(final String peerId, final List<String> contractAddresses, final LiquichainIBFTAllowListType type) {
@@ -98,8 +100,7 @@ public class LiquichainIBFTValidationProvider {
     };
   }
 
-  public boolean validateBySmartContractList(final String contractAddress,
-                                             final Optional<EthPeer> peer) {
+  public boolean validateBySmartContractList(final String contractAddress, final Optional<EthPeer> peer) {
     List<String> whiteList;
     List<String> blackList;
     if (peer.isEmpty()) {
@@ -122,6 +123,24 @@ public class LiquichainIBFTValidationProvider {
     }
 
     return true;
+  }
+
+
+  private void sendListOnUpdate(final LiquichainIBFTAllowListType type) {
+    final LiquichainIBFTContractAddressListMessageData messageData = switch (type) {
+      case WHITE_LIST ->
+          LiquichainIBFTContractAddressListMessageData.create(whiteList, LiquichainIBFTAllowListType.WHITE_LIST);
+      case BLACK_LIST ->
+          LiquichainIBFTContractAddressListMessageData.create(blackList, LiquichainIBFTAllowListType.BLACK_LIST);
+    };
+
+    var unused = ethContext.getEthPeers().streamAvailablePeers().map(peer -> {
+      try {
+        return peer.send(messageData, LiquichainIBFTSubProtocol.get().getName());
+      } catch (PeerConnection.PeerNotConnected e) {
+        throw new RuntimeException(e);
+      }
+    });
   }
 
 }
