@@ -118,7 +118,9 @@ public class LiquichainIBFTValidationProvider {
     if (whiteList != null && !whiteList.isEmpty()) {
       final Optional<String> matchAddress = whiteList.stream().filter(address -> address.equals(contractAddress)).findAny();
       LOG.info("Whitelist Is Present " + matchAddress.isPresent());
-      return matchAddress.isPresent();
+      if (matchAddress.isEmpty()) {
+        return false;
+      }
     }
 
     if (blackList != null && !blackList.isEmpty()) {
@@ -126,7 +128,6 @@ public class LiquichainIBFTValidationProvider {
       LOG.info("Blacklist is Present " + matchAddress.isEmpty());
       return matchAddress.isEmpty();
     }
-
     return true;
   }
 
@@ -139,10 +140,14 @@ public class LiquichainIBFTValidationProvider {
           LiquichainIBFTContractAddressListMessageData.create(blackList, LiquichainIBFTAllowListType.BLACK_LIST);
     };
 
-    var unused = ethContext.getEthPeers().streamAvailablePeers().map(peer -> {
+    LOG.info("Send List " + messageData.getCode() + " " + ethContext.getEthPeers().streamAvailablePeers().count());
+
+    ethContext.getEthPeers().streamAvailablePeers().forEach(peer -> {
+      LOG.info("Stream To Peer", peer.getId());
       try {
-        return peer.send(messageData, LiquichainIBFTSubProtocol.get().getName());
+        peer.send(messageData, LiquichainIBFTSubProtocol.get().getName());
       } catch (PeerConnection.PeerNotConnected e) {
+        LOG.info("Error " + e);
         throw new RuntimeException(e);
       }
     });

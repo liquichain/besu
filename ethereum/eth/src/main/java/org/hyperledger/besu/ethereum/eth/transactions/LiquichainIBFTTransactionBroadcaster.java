@@ -165,7 +165,7 @@ public class LiquichainIBFTTransactionBroadcaster extends TransactionBroadcaster
             transactions.forEach(
                 transaction -> {
                   var isAllowed = isTransactionAllowedToSend(peer, transaction);
-                  LOG.atInfo().setMessage("Peer {}, Is Allowed To Send Trasaction {}")
+                  LOG.atInfo().setMessage("Peer {}, Is Allowed To Send Transaction {}")
                       .addArgument(peer.getId())
                       .addArgument(isAllowed).log();
                   if (isAllowed) {
