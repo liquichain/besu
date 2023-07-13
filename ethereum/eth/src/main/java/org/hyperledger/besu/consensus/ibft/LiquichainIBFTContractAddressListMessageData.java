@@ -3,13 +3,16 @@ package org.hyperledger.besu.consensus.ibft;
 import org.apache.tuweni.bytes.Bytes;
 import org.hyperledger.besu.consensus.ibft.encoder.StringEncoder;
 import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
+import org.hyperledger.besu.datatypes.Address;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.AbstractMessageData;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPInput;
 import org.hyperledger.besu.ethereum.rlp.BytesValueRLPOutput;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 public class LiquichainIBFTContractAddressListMessageData extends AbstractLiquichainMessageData {
@@ -36,15 +39,15 @@ public class LiquichainIBFTContractAddressListMessageData extends AbstractLiquic
    * @param type      the type
    * @return the liquichain ibft contract address list message data
    */
-  public static LiquichainIBFTContractAddressListMessageData create(final List<String> addresses, final LiquichainIBFTAllowListType type) {
+  public static LiquichainIBFTContractAddressListMessageData create(final Set<Address> addresses, final LiquichainIBFTAllowListType type) {
     final BytesValueRLPOutput out = new BytesValueRLPOutput();
 
 
     out.writeBytes(StringEncoder.getBytes(type.getValue()));
 
     out.startList();
-    for (final String address : addresses) {
-      out.writeBytes(StringEncoder.getBytes(address));
+    for (final Address address : addresses) {
+      out.writeBytes(StringEncoder.getBytes(address.toString()));
     }
     out.endList();
 
@@ -64,14 +67,9 @@ public class LiquichainIBFTContractAddressListMessageData extends AbstractLiquic
     return LiquichainIBFTAllowListType.fromString(StringEncoder.readBytes(type));
   }
 
-  public List<String> getContractAddressList() {
+  public Set<Address> getContractAddressList() {
     final BytesValueRLPInput input = new BytesValueRLPInput(data, false);
     input.skipNext();
-    return input.readList(this::readFrom);
-  }
-
-  public String readFrom(final RLPInput input) {
-    final Bytes address = input.readBytes();
-    return StringEncoder.readBytes(address);
+    return new HashSet<>(input.readList(Address::readFrom));
   }
 }
