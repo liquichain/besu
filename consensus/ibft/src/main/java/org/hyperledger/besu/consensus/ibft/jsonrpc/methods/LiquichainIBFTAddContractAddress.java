@@ -2,6 +2,7 @@ package org.hyperledger.besu.consensus.ibft.jsonrpc.methods;
 
 import org.hyperledger.besu.consensus.ibft.LiquichainIBFTValidationProvider;
 import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
+import org.hyperledger.besu.datatypes.Address;
 import org.hyperledger.besu.ethereum.api.jsonrpc.RpcMethod;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequestContext;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.JsonRpcMethod;
@@ -26,7 +27,7 @@ public class LiquichainIBFTAddContractAddress implements JsonRpcMethod {
   @Override
   public JsonRpcResponse response(final JsonRpcRequestContext requestContext) {
     final LiquichainIBFTAllowListType type = LiquichainIBFTAllowListType.fromString(requestContext.getRequiredParameter(0, String.class));
-    final String contractAddress = requestContext.getRequiredParameter(1, String.class);
+    final Address contractAddress = requestContext.getRequiredParameter(1, Address.class);
     final Boolean add = requestContext.getRequiredParameter(2, Boolean.class);
 
     if (type == null) {

@@ -2,6 +2,7 @@ package org.hyperledger.besu.consensus.ibft;
 
 import org.apache.tuweni.bytes.Bytes;
 import org.hyperledger.besu.consensus.ibft.enums.LiquichainIBFTAllowListType;
+import org.hyperledger.besu.datatypes.Address;
 import org.hyperledger.besu.ethereum.p2p.network.ProtocolManager;
 import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
@@ -11,8 +12,10 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.messages.DisconnectMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class LiquichainIBFTProtocolManager implements ProtocolManager {
   private final String subProtocolName;
@@ -51,12 +54,12 @@ public class LiquichainIBFTProtocolManager implements ProtocolManager {
   public void processMessage(final Capability cap, final Message message) {
     LOG.info("Process Message " + message.getConnection().getPeer().getId());
     final LiquichainIBFTContractAddressListMessageData messageData = LiquichainIBFTContractAddressListMessageData.fromMessageData(message.getData());
-    final Bytes peerId = message.getConnection().getPeer().getId();
-    final List<String> contractAddressList = messageData.getContractAddressList();
+    final PeerConnection peerConnection = message.getConnection();
+    final Set<Address> contractAddressList = messageData.getContractAddressList();
     final LiquichainIBFTAllowListType type = messageData.getType();
     LOG.info("ContractAddress " + contractAddressList);
     LOG.info("Type " + type);
-    validationProvider.updatePeerContractAddressList(peerId.toString(), contractAddressList, type);
+    validationProvider.updatePeerContractAddressList(peerConnection.getPeerInfo().getAddress(), contractAddressList, type);
   }
 
   @Override

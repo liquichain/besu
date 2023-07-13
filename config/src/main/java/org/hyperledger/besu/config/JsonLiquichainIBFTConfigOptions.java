@@ -4,8 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.hyperledger.besu.datatypes.Address;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalLong;
@@ -33,15 +35,15 @@ public class JsonLiquichainIBFTConfigOptions extends JsonBftConfigOptions implem
   }
 
   @Override
-  public List<String> getSmartContractWhiteList() {
+  public Collection<Address> getSmartContractWhiteList() {
     Optional<ArrayNode> maybeNode = JsonUtil.getArrayNode(this.bftConfigRoot, SMART_CONTRACT_WHITELIST_KEY);
 
-    List<String> whiteList = new ArrayList<>();
+    Collection<Address> whiteList = new ArrayList<>();
 
     try {
       if (maybeNode.isPresent()) {
         whiteList = mapper.treeToValue(maybeNode.get(),
-            mapper.getTypeFactory().constructCollectionType(List.class, String.class));
+            mapper.getTypeFactory().constructCollectionType(Collection.class, Address.class));
       }
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);
@@ -51,13 +53,13 @@ public class JsonLiquichainIBFTConfigOptions extends JsonBftConfigOptions implem
   }
 
   @Override
-  public List<String> getSmartContractBlackList() {
+  public Collection<Address> getSmartContractBlackList() {
     Optional<ArrayNode> maybeNode = JsonUtil.getArrayNode(this.bftConfigRoot, SMART_CONTRACT_BLACKLIST_KEY);
-    List<String> blackList = new ArrayList<>();
+    Collection<Address> blackList = new ArrayList<>();
     try {
       if (maybeNode.isPresent()) {
         blackList = mapper.treeToValue(maybeNode.get(),
-            mapper.getTypeFactory().constructCollectionType(List.class, String.class));
+            mapper.getTypeFactory().constructCollectionType(Collection.class, Address.class));
       }
     } catch (JsonProcessingException e) {
       throw new RuntimeException(e);

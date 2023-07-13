@@ -1,11 +1,13 @@
 package org.hyperledger.besu.config;
 
-import java.util.List;
+import org.hyperledger.besu.datatypes.Address;
+
+import java.util.Collection;
 
 public interface LiquichainIBFTConfigOptions extends BftConfigOptions {
-  List<String> getSmartContractWhiteList();
+  Collection<Address> getSmartContractWhiteList();
 
-  List<String> getSmartContractBlackList();
+  Collection<Address> getSmartContractBlackList();
 
   long getNoTransactionBlockPeriodSeconds();
 }

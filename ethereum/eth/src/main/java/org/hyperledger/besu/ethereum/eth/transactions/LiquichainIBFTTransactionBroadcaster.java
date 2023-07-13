@@ -222,7 +222,7 @@ public class LiquichainIBFTTransactionBroadcaster extends TransactionBroadcaster
     if (transaction.getTo().isPresent()) {
       final Optional<Account> toAccount = Optional.ofNullable(worldState.get(transaction.getTo().get()));
       if (toAccount.isPresent() && toAccount.get().hasCode()) {
-        return validationProvider.validateBySmartContractList(toAccount.get().getAddress().toString(), Optional.of(peer));
+        return validationProvider.validateBySmartContractList(toAccount.get().getAddress(), Optional.of(peer));
       }
     }
 
