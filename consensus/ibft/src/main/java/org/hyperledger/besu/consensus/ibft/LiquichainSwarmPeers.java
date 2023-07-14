@@ -5,6 +5,7 @@ import org.hyperledger.besu.consensus.common.bft.network.ValidatorMulticaster;
 import org.hyperledger.besu.consensus.common.bft.network.ValidatorPeers;
 import org.hyperledger.besu.consensus.common.validator.ValidatorProvider;
 import org.hyperledger.besu.datatypes.Address;
+import org.hyperledger.besu.ethereum.p2p.peers.Peer;
 import org.hyperledger.besu.ethereum.p2p.rlpx.connections.PeerConnection;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-public class LiquichainSwamPeers implements ValidatorMulticaster, PeerConnectionTracker {
+public class LiquichainSwarmPeers implements ValidatorMulticaster, PeerConnectionTracker {
   private static final Logger LOG = LoggerFactory.getLogger(ValidatorPeers.class);
 
 
@@ -27,7 +28,7 @@ public class LiquichainSwamPeers implements ValidatorMulticaster, PeerConnection
   private final String protocolName;
 
 
-  private final Map<Address, Set<Address>> nodeByContractAddress = new ConcurrentHashMap<>();
+  private final Map<Address, Set<PeerConnection>> nodeByContractAddress = new ConcurrentHashMap<>();
 
   /**
    * Instantiates a new Validator peers.
@@ -35,40 +36,52 @@ public class LiquichainSwamPeers implements ValidatorMulticaster, PeerConnection
    * @param validatorProvider the validator provider
    * @param protocolName      the protocol name
    */
-  public LiquichainSwamPeers(ValidatorProvider validatorProvider, String protocolName) {
+  public LiquichainSwarmPeers(final ValidatorProvider validatorProvider, final String protocolName) {
     this.validatorProvider = validatorProvider;
     this.protocolName = protocolName;
   }
 
-  public void addNodeToSmartContract(Address contractAddress, Set<Address> nodeAddresses) {
-    final Set<Address> addresses = nodeByContractAddress.computeIfAbsent(contractAddress,
-        (k) -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
-    addresses.addAll(nodeAddresses);
-  }
-
-  public void removeNodeToSmartContract(Address contractAddress, Set<Address> nodeAddresses) {
-    final Set<Address> addresses = nodeByContractAddress.computeIfAbsent(contractAddress,
-        (k) -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
-    addresses.addAll(nodeAddresses);
-  }
-
-  @Override
-  public void add(PeerConnection newConnection) {
-    final Address peerAddress = newConnection.getPeerInfo().getAddress();
-    final Set<PeerConnection> connections =
-        connectionsByAddress.computeIfAbsent(
-            peerAddress, (k) -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
-    connections.add(newConnection);
-  }
-
-  @Override
-  public void remove(PeerConnection removedConnection) {
-    final Address peerAddress = removedConnection.getPeerInfo().getAddress();
-    final Set<PeerConnection> connections = connectionsByAddress.get(peerAddress);
-    if (connections == null) {
-      return;
+  public void addNodeToSmartContracts(final PeerConnection peerConnection, final Set<Address> contractAddresses) {
+    for (Address contractAddress : contractAddresses) {
+      final Set<PeerConnection> addresses = nodeByContractAddress.computeIfAbsent(contractAddress,
+          (k) -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
+      addresses.add(peerConnection);
     }
-    connections.remove(removedConnection);
+  }
+
+  public void removeNodeToSmartContracts(final PeerConnection peerConnection, final Set<Address> contractAddresses) {
+    for (Address contractAddress : contractAddresses) {
+      final Set<PeerConnection> addresses = nodeByContractAddress.computeIfAbsent(contractAddress,
+          (k) -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
+      if (addresses.contains(peerConnection))
+        addresses.remove(peerConnection);
+    }
+  }
+
+  @Override
+  public void add(final PeerConnection newConnection) {
+//    final Address peerAddress = newConnection.getPeerInfo().getAddress();
+//    final Set<PeerConnection> connections =
+//        connectionsByAddress.computeIfAbsent(
+//            peerAddress, (k) -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
+//    connections.add(newConnection);
+  }
+
+  @Override
+  public void remove(final PeerConnection removedConnection) {
+//    final Address peerAddress = removedConnection.getPeerInfo().getAddress();
+//    final Set<PeerConnection> connections = connectionsByAddress.get(peerAddress);
+//    if (connections == null) {
+//      return;
+//    }
+//    connections.remove(removedConnection);
+
+    for (Map.Entry<Address, Set<PeerConnection>> entry : nodeByContractAddress.entrySet()) {
+      Set<PeerConnection> connections = entry.getValue();
+      if (connections == null) continue;
+      connections.remove(removedConnection);
+    }
+
   }
 
   @Override

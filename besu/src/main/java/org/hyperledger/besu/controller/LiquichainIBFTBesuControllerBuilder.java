@@ -51,6 +51,7 @@ import org.hyperledger.besu.consensus.ibft.IbftExtraDataCodec;
 import org.hyperledger.besu.consensus.ibft.IbftForksSchedulesFactory;
 import org.hyperledger.besu.consensus.ibft.IbftGossip;
 import org.hyperledger.besu.consensus.ibft.LiquichainIBFTTransactionContext;
+import org.hyperledger.besu.consensus.ibft.LiquichainSwarmPeers;
 import org.hyperledger.besu.consensus.ibft.jsonrpc.LiquichainIBFTJsonRpcMethods;
 import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
 import org.hyperledger.besu.consensus.ibft.protocol.IbftSubProtocol;
@@ -106,6 +107,7 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
   private ForksSchedule<BftConfigOptions> forksSchedule;
   private ValidatorPeers peers;
 
+  private LiquichainSwarmPeers swarmPeers;
   private LiquichainIBFTValidationProvider validationProvider;
 
   @Override
@@ -142,6 +144,7 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
                 new BftProtocolManager(
                     bftEventQueue, peers, IbftSubProtocol.IBFV1, IbftSubProtocol.get().getName()))
             .withSubProtocol(LiquichainIBFTSubProtocol.get(), new LiquichainIBFTProtocolManager(validationProvider,
+                swarmPeers,
                 LiquichainIBFTSubProtocol.LiquichainIBFTV1,
                 LiquichainIBFTSubProtocol.get().getName()));
     maybeSnapProtocolManager.ifPresent(
@@ -185,6 +188,7 @@ public class LiquichainIBFTBesuControllerBuilder extends BftBesuControllerBuilde
     // NOTE: peers should not be used for accessing the network as it does not enforce the
     // "only send once" filter applied by the UniqueMessageMulticaster.
     peers = new ValidatorPeers(validatorProvider, IbftSubProtocol.NAME);
+    swarmPeers = new LiquichainSwarmPeers(validatorProvider, LiquichainIBFTSubProtocol.NAME);
 
     final UniqueMessageMulticaster uniqueMessageMulticaster =
         new UniqueMessageMulticaster(peers, liquichainIbftConfig.getGossipedHistoryLimit());

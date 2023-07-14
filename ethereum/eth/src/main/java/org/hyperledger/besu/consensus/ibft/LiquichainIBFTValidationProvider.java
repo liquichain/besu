@@ -43,7 +43,6 @@ public class LiquichainIBFTValidationProvider {
 
   public void setEthContext(final EthContext context) {
     ethContext = context;
-    ethContext.getEthPeers().subscribeConnect(this::handlePeer);
   }
 
   public void updateSmartContractWhiteList(final Address address, final Boolean add) {
@@ -73,17 +72,17 @@ public class LiquichainIBFTValidationProvider {
     }
   }
 
-  public void handlePeer(final EthPeer peer) {
+  public void handlePeer(final PeerConnection connection) {
     try {
-      peer.send(LiquichainIBFTContractAddressListMessageData.create(whiteList, LiquichainIBFTAllowListType.WHITE_LIST), LiquichainIBFTSubProtocol.get().getName());
-      peer.send(LiquichainIBFTContractAddressListMessageData.create(blackList, LiquichainIBFTAllowListType.BLACK_LIST), LiquichainIBFTSubProtocol.get().getName());
+      connection.sendForProtocol(LiquichainIBFTSubProtocol.get().getName(), LiquichainIBFTContractAddressListMessageData.create(whiteList, LiquichainIBFTAllowListType.WHITE_LIST));
+      connection.sendForProtocol(LiquichainIBFTSubProtocol.get().getName(), LiquichainIBFTContractAddressListMessageData.create(blackList, LiquichainIBFTAllowListType.BLACK_LIST));
     } catch (PeerConnection.PeerNotConnected e) {
       throw new RuntimeException(e);
     }
   }
 
-  public Set<Address> getSmartContracListByPeer(final EthPeer peer, final LiquichainIBFTAllowListType type) {
-    Address peerAddress = peer.getConnection().getPeerInfo().getAddress();
+  public Set<Address> getSmartContracListByPeer(final PeerConnection peerConnection, final LiquichainIBFTAllowListType type) {
+    Address peerAddress = peerConnection.getPeerInfo().getAddress();
     return switch (type) {
       case WHITE_LIST ->
           peersWhiteList.computeIfAbsent(peerAddress, (k) -> Collections.newSetFromMap(new ConcurrentHashMap<>()));
@@ -99,9 +98,8 @@ public class LiquichainIBFTValidationProvider {
       whiteList = this.whiteList;
       blackList = this.blackList;
     } else {
-      whiteList = getSmartContracListByPeer(peer.get(), LiquichainIBFTAllowListType.WHITE_LIST);
-      blackList = getSmartContracListByPeer(peer.get(), LiquichainIBFTAllowListType.BLACK_LIST);
-
+      whiteList = getSmartContracListByPeer(peer.get().getConnection(), LiquichainIBFTAllowListType.WHITE_LIST);
+      blackList = getSmartContracListByPeer(peer.get().getConnection(), LiquichainIBFTAllowListType.BLACK_LIST);
     }
 
     LOG.info("Whitelist " + whiteList);
