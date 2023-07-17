@@ -1,49 +1,52 @@
 package org.hyperledger.besu.consensus.ibft;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import org.hyperledger.besu.config.QbftConfigOptions;
 import org.hyperledger.besu.consensus.common.ForksSchedule;
 import org.hyperledger.besu.consensus.common.validator.ValidatorProvider;
 import org.hyperledger.besu.consensus.common.validator.VoteProvider;
+import org.hyperledger.besu.consensus.common.validator.blockbased.BlockValidatorProvider;
 import org.hyperledger.besu.datatypes.Address;
 import org.hyperledger.besu.ethereum.chain.Blockchain;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Optional;
 
-public class LiquichainIBFTTransactionValidatorProvider implements ValidatorProvider {
+public class LiquichainIBFTValidatorProvider implements ValidatorProvider {
   private final Blockchain blockchain;
   private final ForksSchedule<QbftConfigOptions> forksSchedule;
-  private final Cache<Long, Collection<Address>> afterBlockValidatorCache =
-      CacheBuilder.newBuilder().maximumSize(100).build();
-  private final Cache<Long, Collection<Address>> forBlockValidatorCache =
-      CacheBuilder.newBuilder().maximumSize(100).build();
+  private final BlockValidatorProvider blockValidatorProvider;
 
-  public LiquichainIBFTTransactionValidatorProvider(final Blockchain blockchain,
-                                                    final ForksSchedule<QbftConfigOptions> forksSchedule) {
+  public LiquichainIBFTValidatorProvider(final Blockchain blockchain,
+                                         final ForksSchedule<QbftConfigOptions> forksSchedule,
+                                         final BlockValidatorProvider blockValidatorProvider) {
     this.blockchain = blockchain;
     this.forksSchedule = forksSchedule;
+    this.blockValidatorProvider = blockValidatorProvider;
   }
 
   @Override
   public Collection<Address> getValidatorsAtHead() {
-    return null;
+    return blockValidatorProvider.getValidatorsAtHead();
   }
 
   @Override
   public Collection<Address> getValidatorsAfterBlock(BlockHeader header) {
-    return null;
+    return blockValidatorProvider.getValidatorsAfterBlock(header);
   }
 
   @Override
   public Collection<Address> getValidatorsForBlock(BlockHeader header) {
-    return null;
+    return blockValidatorProvider.getValidatorsForBlock(header);
   }
 
   @Override
   public Optional<VoteProvider> getVoteProviderAtHead() {
     return Optional.empty();
+  }
+
+  public Collection<Address> getValidatorsForSmartContract(Address contractAddress) {
+    return new ArrayList<>();
   }
 }

@@ -26,5 +26,4 @@ public class LiquichainIBFTContext extends BftContext {
   public LiquichainIBFTValidationProvider getValidationProvider() {
     return this.validationProvider;
   }
-
 }
