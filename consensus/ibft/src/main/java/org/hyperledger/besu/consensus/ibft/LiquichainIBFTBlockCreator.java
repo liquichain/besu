@@ -8,11 +8,17 @@ import org.hyperledger.besu.consensus.common.bft.blockcreation.BftBlockCreator;
 import org.hyperledger.besu.datatypes.Address;
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.blockcreation.BlockTransactionSelector;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
+import org.hyperledger.besu.ethereum.core.MutableWorldState;
+import org.hyperledger.besu.ethereum.core.ProcessableBlockHeader;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.core.Withdrawal;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
+import org.hyperledger.besu.ethereum.mainnet.AbstractBlockProcessor;
+import org.hyperledger.besu.ethereum.mainnet.MainnetTransactionProcessor;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSpec;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +53,21 @@ public class LiquichainIBFTBlockCreator extends BftBlockCreator {
   }
 
   @Override
-  protected BlockCreationResult createBlock(Optional<List<Transaction>> maybeTransactions, Optional<List<BlockHeader>> maybeOmmers, Optional<List<Withdrawal>> maybeWithdrawals, Optional<Bytes32> maybePrevRandao, long timestamp, boolean rewardCoinbase) {
+  protected BlockCreationResult createBlock(final Optional<List<Transaction>> maybeTransactions,
+                                            final Optional<List<BlockHeader>> maybeOmmers,
+                                            final Optional<List<Withdrawal>> maybeWithdrawals,
+                                            final Optional<Bytes32> maybePrevRandao,
+                                            final long timestamp,
+                                            final boolean rewardCoinbase) {
+    return super.createBlock(maybeTransactions, maybeOmmers, maybeWithdrawals, maybePrevRandao, timestamp, rewardCoinbase);
+  }
+
+  protected BlockCreationResult createSubBlock(final Optional<List<Transaction>> maybeTransactions,
+                                               final Optional<List<BlockHeader>> maybeOmmers,
+                                               final Optional<List<Withdrawal>> maybeWithdrawals,
+                                               final Optional<Bytes32> maybePrevRandao,
+                                               final long timestamp,
+                                               final boolean rewardCoinbase) {
     return super.createBlock(maybeTransactions, maybeOmmers, maybeWithdrawals, maybePrevRandao, timestamp, rewardCoinbase);
   }
 }
