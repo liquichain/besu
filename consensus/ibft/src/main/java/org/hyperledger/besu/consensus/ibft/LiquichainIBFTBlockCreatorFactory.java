@@ -8,23 +8,28 @@ import org.hyperledger.besu.consensus.common.bft.BftExtraData;
 import org.hyperledger.besu.consensus.common.bft.BftExtraDataCodec;
 import org.hyperledger.besu.consensus.common.bft.blockcreation.BftBlockCreatorFactory;
 import org.hyperledger.besu.consensus.common.validator.ValidatorProvider;
-import org.hyperledger.besu.consensus.common.validator.blockbased.BlockValidatorProvider;
 import org.hyperledger.besu.datatypes.Address;
+import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.ProtocolContext;
+import org.hyperledger.besu.ethereum.blockcreation.BlockTransactionSelector;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.MiningParameters;
-import org.hyperledger.besu.ethereum.eth.transactions.PendingTransaction;
+import org.hyperledger.besu.ethereum.core.MutableWorldState;
+import org.hyperledger.besu.ethereum.core.ProcessableBlockHeader;
+import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
+import org.hyperledger.besu.ethereum.mainnet.AbstractBlockProcessor;
+import org.hyperledger.besu.ethereum.mainnet.MainnetTransactionProcessor;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
+import org.hyperledger.besu.ethereum.mainnet.ProtocolSpec;
 
-import javax.swing.text.html.Option;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 public class LiquichainIBFTBlockCreatorFactory extends BftBlockCreatorFactory<LiquichainIBFTConfigOptions> {
 
+  private final PendingTransactions pendingTransactions;
   /**
    * Instantiates a new Bft block creator factory.
    *
@@ -39,8 +44,13 @@ public class LiquichainIBFTBlockCreatorFactory extends BftBlockCreatorFactory<Li
   public LiquichainIBFTBlockCreatorFactory(final PendingTransactions pendingTransactions,
                                            final ProtocolContext protocolContext,
                                            final ProtocolSchedule protocolSchedule,
-                                           final ForksSchedule<LiquichainIBFTConfigOptions> forksSchedule, MiningParameters miningParams, Address localAddress, BftExtraDataCodec bftExtraDataCodec) {
+                                           final ForksSchedule<LiquichainIBFTConfigOptions> forksSchedule,
+                                           final MiningParameters miningParams,
+                                           final Address localAddress,
+                                           final BftExtraDataCodec bftExtraDataCodec) {
     super(pendingTransactions, protocolContext, protocolSchedule, forksSchedule, miningParams, localAddress, bftExtraDataCodec);
+    this.pendingTransactions = pendingTransactions;
+
   }
 
   @Override
@@ -51,6 +61,8 @@ public class LiquichainIBFTBlockCreatorFactory extends BftBlockCreatorFactory<Li
     final ValidatorProvider validatorProvider = context.getValidatorProvider();
 
     if (validatorProvider instanceof LiquichainIBFTValidatorProvider) {
+
+
       final BftExtraData extraData =
           new BftExtraData(
               ConsensusHelpers.zeroLeftPad(vanityData, BftExtraDataCodec.EXTRA_VANITY_LENGTH),
@@ -63,4 +75,5 @@ public class LiquichainIBFTBlockCreatorFactory extends BftBlockCreatorFactory<Li
     }
     return super.createExtraData(round, parentHeader);
   }
+
 }
