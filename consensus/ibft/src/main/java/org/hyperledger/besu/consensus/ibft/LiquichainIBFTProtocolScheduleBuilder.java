@@ -121,7 +121,6 @@ public class LiquichainIBFTProtocolScheduleBuilder extends IbftProtocolScheduleB
 
     return new BftProtocolSchedule((DefaultProtocolSchedule) protocolSchedule);
   }
-
   private ProtocolSpecBuilder applyBftChanges(
       final long blockIdentifier,
       final TreeMap<Long, Function<ProtocolSpecBuilder, ProtocolSpecBuilder>> milestones,
