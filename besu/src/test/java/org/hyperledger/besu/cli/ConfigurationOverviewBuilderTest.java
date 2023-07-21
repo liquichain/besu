@@ -137,22 +137,10 @@ class ConfigurationOverviewBuilderTest {
   @Test
   void setHighSpecEnabled() {
     final String highSpecNotEnabled = builder.build();
-    assertThat(highSpecNotEnabled).doesNotContain("Experimental high spec configuration enabled");
+    assertThat(highSpecNotEnabled).doesNotContain("High spec configuration enabled");
 
     builder.setHighSpecEnabled();
     final String highSpecEnabled = builder.build();
-    assertThat(highSpecEnabled).contains("Experimental high spec configuration enabled");
-  }
-
-  @Test
-  void setLayeredTxPoolEnabled() {
-    final String layeredTxPoolDisabled = builder.build();
-    assertThat(layeredTxPoolDisabled)
-        .doesNotContain("Experimental layered transaction pool configuration enabled");
-
-    builder.setLayeredTxPoolEnabled();
-    final String layeredTxPoolEnabled = builder.build();
-    assertThat(layeredTxPoolEnabled)
-        .contains("Experimental layered transaction pool configuration enabled");
+    assertThat(highSpecEnabled).contains("High spec configuration enabled");
   }
 }

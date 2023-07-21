@@ -24,7 +24,7 @@ import java.util.Optional;
 public interface BftConfigOptions {
 
   /**
-   * The number of blocks in an epoch.
+   * Gets epoch length.
    *
    * @return the epoch length
    */

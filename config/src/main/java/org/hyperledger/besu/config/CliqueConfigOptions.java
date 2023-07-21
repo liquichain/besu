@@ -41,7 +41,7 @@ public class CliqueConfigOptions {
   }
 
   /**
-   * The number of blocks in an epoch.
+   * Gets epoch length.
    *
    * @return the epoch length
    */
