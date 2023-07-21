@@ -21,7 +21,7 @@ import org.hyperledger.besu.ethereum.chain.MinedBlockObserver;
 import org.hyperledger.besu.ethereum.chain.PoWObserver;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.MiningParameters;
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.ethereum.mainnet.AbstractGasLimitSpecification;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.util.Subscribers;
@@ -45,7 +45,7 @@ public abstract class AbstractMinerExecutor<M extends BlockMiner<? extends Abstr
   private final ExecutorService executorService = Executors.newCachedThreadPool();
   protected final ProtocolContext protocolContext;
   protected final ProtocolSchedule protocolSchedule;
-  protected final TransactionPool transactionPool;
+  protected final PendingTransactions pendingTransactions;
   protected final AbstractBlockScheduler blockScheduler;
 
   protected volatile Bytes extraData;
@@ -58,12 +58,12 @@ public abstract class AbstractMinerExecutor<M extends BlockMiner<? extends Abstr
   protected AbstractMinerExecutor(
       final ProtocolContext protocolContext,
       final ProtocolSchedule protocolSchedule,
-      final TransactionPool transactionPool,
+      final PendingTransactions pendingTransactions,
       final MiningParameters miningParams,
       final AbstractBlockScheduler blockScheduler) {
     this.protocolContext = protocolContext;
     this.protocolSchedule = protocolSchedule;
-    this.transactionPool = transactionPool;
+    this.pendingTransactions = pendingTransactions;
     this.extraData = miningParams.getExtraData();
     this.minTransactionGasPrice = miningParams.getMinTransactionGasPrice();
     this.blockScheduler = blockScheduler;

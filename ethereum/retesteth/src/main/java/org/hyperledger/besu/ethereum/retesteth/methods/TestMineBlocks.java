@@ -67,7 +67,7 @@ public class TestMineBlocks implements JsonRpcMethod {
             context.getCoinbase(),
             () -> Optional.of(blockchain.getChainHeadHeader().getGasLimit()),
             header -> context.getExtraData(),
-            context.getTransactionPool(),
+            context.getTransactionPool().getPendingTransactions(),
             protocolContext,
             protocolSchedule,
             context.getEthHashSolver(),

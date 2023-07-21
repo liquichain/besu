@@ -20,7 +20,7 @@ import org.hyperledger.besu.ethereum.api.graphql.GraphQLContextType;
 import org.hyperledger.besu.ethereum.api.query.BlockchainQueries;
 import org.hyperledger.besu.ethereum.api.query.TransactionWithMetadata;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransaction;
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.ethereum.mainnet.ImmutableTransactionValidationParams;
 import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.ethereum.mainnet.TransactionValidationParams;
@@ -39,18 +39,18 @@ import org.apache.tuweni.units.bigints.UInt256;
 @SuppressWarnings("unused") // reflected by GraphQL
 public class PendingStateAdapter extends AdapterBase {
 
-  private final TransactionPool transactionPool;
+  private final PendingTransactions pendingTransactions;
 
-  public PendingStateAdapter(final TransactionPool transactionPool) {
-    this.transactionPool = transactionPool;
+  public PendingStateAdapter(final PendingTransactions pendingTransactions) {
+    this.pendingTransactions = pendingTransactions;
   }
 
   public Integer getTransactionCount() {
-    return transactionPool.count();
+    return pendingTransactions.size();
   }
 
   public List<TransactionAdapter> getTransactions() {
-    return transactionPool.getPendingTransactions().stream()
+    return pendingTransactions.getPendingTransactions().stream()
         .map(PendingTransaction::getTransaction)
         .map(TransactionWithMetadata::new)
         .map(TransactionAdapter::new)

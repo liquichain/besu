@@ -16,7 +16,6 @@ package org.hyperledger.besu.consensus.clique.blockcreation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -39,13 +38,8 @@ import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderTestFixture;
 import org.hyperledger.besu.ethereum.core.MiningParameters;
 import org.hyperledger.besu.ethereum.core.Util;
-import org.hyperledger.besu.ethereum.eth.manager.EthContext;
 import org.hyperledger.besu.ethereum.eth.transactions.ImmutableTransactionPoolConfiguration;
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionBroadcaster;
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionPoolMetrics;
 import org.hyperledger.besu.ethereum.eth.transactions.sorter.GasPricePendingTransactionsSorter;
-import org.hyperledger.besu.ethereum.mainnet.ProtocolSchedule;
 import org.hyperledger.besu.evm.internal.EvmConfiguration;
 import org.hyperledger.besu.metrics.noop.NoOpMetricsSystem;
 import org.hyperledger.besu.plugin.services.MetricsSystem;
@@ -71,8 +65,6 @@ public class CliqueMinerExecutorTest {
   private Address localAddress;
   private final List<Address> validatorList = Lists.newArrayList();
   private ProtocolContext cliqueProtocolContext;
-  private ProtocolSchedule cliqueProtocolSchedule;
-  private EthContext cliqueEthContext;
   private BlockHeaderTestFixture blockHeaderBuilder;
   private final MetricsSystem metricsSystem = new NoOpMetricsSystem();
   private final CliqueBlockInterface blockInterface = new CliqueBlockInterface();
@@ -90,10 +82,6 @@ public class CliqueMinerExecutorTest {
 
     final CliqueContext cliqueContext = new CliqueContext(validatorProvider, null, blockInterface);
     cliqueProtocolContext = new ProtocolContext(null, null, cliqueContext, Optional.empty());
-    cliqueProtocolSchedule =
-        CliqueProtocolSchedule.create(
-            GENESIS_CONFIG_OPTIONS, proposerNodeKey, false, EvmConfiguration.DEFAULT);
-    cliqueEthContext = mock(EthContext.class, RETURNS_DEEP_STUBS);
     blockHeaderBuilder = new BlockHeaderTestFixture();
   }
 
@@ -104,8 +92,13 @@ public class CliqueMinerExecutorTest {
     final CliqueMinerExecutor executor =
         new CliqueMinerExecutor(
             cliqueProtocolContext,
-            cliqueProtocolSchedule,
-            createTransactionPool(),
+            CliqueProtocolSchedule.create(
+                GENESIS_CONFIG_OPTIONS, proposerNodeKey, false, EvmConfiguration.DEFAULT),
+            new GasPricePendingTransactionsSorter(
+                ImmutableTransactionPoolConfiguration.builder().txPoolMaxSize(1).build(),
+                TestClock.system(ZoneId.systemDefault()),
+                metricsSystem,
+                CliqueMinerExecutorTest::mockBlockHeader),
             proposerNodeKey,
             new MiningParameters.Builder()
                 .coinbase(AddressHelpers.ofValue(1))
@@ -141,8 +134,13 @@ public class CliqueMinerExecutorTest {
     final CliqueMinerExecutor executor =
         new CliqueMinerExecutor(
             cliqueProtocolContext,
-            cliqueProtocolSchedule,
-            createTransactionPool(),
+            CliqueProtocolSchedule.create(
+                GENESIS_CONFIG_OPTIONS, proposerNodeKey, false, EvmConfiguration.DEFAULT),
+            new GasPricePendingTransactionsSorter(
+                ImmutableTransactionPoolConfiguration.builder().txPoolMaxSize(1).build(),
+                TestClock.system(ZoneId.systemDefault()),
+                metricsSystem,
+                CliqueMinerExecutorTest::mockBlockHeader),
             proposerNodeKey,
             new MiningParameters.Builder()
                 .coinbase(AddressHelpers.ofValue(1))
@@ -178,8 +176,13 @@ public class CliqueMinerExecutorTest {
     final CliqueMinerExecutor executor =
         new CliqueMinerExecutor(
             cliqueProtocolContext,
-            cliqueProtocolSchedule,
-            createTransactionPool(),
+            CliqueProtocolSchedule.create(
+                GENESIS_CONFIG_OPTIONS, proposerNodeKey, false, EvmConfiguration.DEFAULT),
+            new GasPricePendingTransactionsSorter(
+                ImmutableTransactionPoolConfiguration.builder().txPoolMaxSize(1).build(),
+                TestClock.system(ZoneId.systemDefault()),
+                metricsSystem,
+                CliqueMinerExecutorTest::mockBlockHeader),
             proposerNodeKey,
             new MiningParameters.Builder()
                 .coinbase(AddressHelpers.ofValue(1))
@@ -201,31 +204,6 @@ public class CliqueMinerExecutorTest {
                 .blockHeaderFunctions(new CliqueBlockHeaderFunctions())
                 .buildHeader());
     assertThat(cliqueExtraData.getVanityData()).isEqualTo(modifiedVanityData);
-  }
-
-  private TransactionPool createTransactionPool() {
-    final var conf = ImmutableTransactionPoolConfiguration.builder().txPoolMaxSize(1).build();
-
-    when(cliqueEthContext.getEthPeers().subscribeConnect(any())).thenReturn(1L);
-
-    final TransactionPool transactionPool =
-        new TransactionPool(
-            () ->
-                new GasPricePendingTransactionsSorter(
-                    conf,
-                    TestClock.system(ZoneId.systemDefault()),
-                    metricsSystem,
-                    CliqueMinerExecutorTest::mockBlockHeader),
-            cliqueProtocolSchedule,
-            cliqueProtocolContext,
-            mock(TransactionBroadcaster.class),
-            cliqueEthContext,
-            mock(MiningParameters.class),
-            new TransactionPoolMetrics(metricsSystem),
-            conf);
-
-    transactionPool.setEnabled();
-    return transactionPool;
   }
 
   private static BlockHeader mockBlockHeader() {

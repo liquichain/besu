@@ -23,7 +23,7 @@ import org.hyperledger.besu.ethereum.core.MutableWorldState;
 import org.hyperledger.besu.ethereum.core.ProcessableBlockHeader;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.core.TransactionReceipt;
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.ethereum.mainnet.AbstractBlockProcessor;
 import org.hyperledger.besu.ethereum.mainnet.MainnetTransactionProcessor;
 import org.hyperledger.besu.ethereum.mainnet.TransactionValidationParams;
@@ -216,7 +216,7 @@ public class BlockTransactionSelector {
   private final ProcessableBlockHeader processableBlockHeader;
   private final Blockchain blockchain;
   private final MutableWorldState worldState;
-  private final TransactionPool transactionPool;
+  private final PendingTransactions pendingTransactions;
   private final AbstractBlockProcessor.TransactionReceiptFactory transactionReceiptFactory;
   private final Address miningBeneficiary;
   private final Wei dataGasPrice;
@@ -232,7 +232,7 @@ public class BlockTransactionSelector {
       final MainnetTransactionProcessor transactionProcessor,
       final Blockchain blockchain,
       final MutableWorldState worldState,
-      final TransactionPool transactionPool,
+      final PendingTransactions pendingTransactions,
       final ProcessableBlockHeader processableBlockHeader,
       final AbstractBlockProcessor.TransactionReceiptFactory transactionReceiptFactory,
       final Wei minTransactionGasPrice,
@@ -247,7 +247,7 @@ public class BlockTransactionSelector {
     this.transactionProcessor = transactionProcessor;
     this.blockchain = blockchain;
     this.worldState = worldState;
-    this.transactionPool = transactionPool;
+    this.pendingTransactions = pendingTransactions;
     this.processableBlockHeader = processableBlockHeader;
     this.transactionReceiptFactory = transactionReceiptFactory;
     this.isCancelled = isCancelled;
@@ -271,9 +271,9 @@ public class BlockTransactionSelector {
   public TransactionSelectionResults buildTransactionListForBlock() {
     LOG.atDebug()
         .setMessage("Transaction pool stats {}")
-        .addArgument(transactionPool::logStats)
+        .addArgument(pendingTransactions.logStats())
         .log();
-    transactionPool.selectTransactions(
+    pendingTransactions.selectTransactions(
         pendingTransaction -> {
           final var res = evaluateTransaction(pendingTransaction);
           transactionSelectionResults.addSelectionResult(res);
@@ -414,7 +414,7 @@ public class BlockTransactionSelector {
     // Here we only care about EIP1159 since for Frontier and local transactions the checks
     // that we do when accepting them in the pool are enough
     if (transaction.getType().supports1559FeeMarket()
-        && !transactionPool.isLocalSender(transaction.getSender())) {
+        && !pendingTransactions.isLocalSender(transaction.getSender())) {
 
       // For EIP1559 transactions, the price is dynamic and depends on network conditions, so we can
       // only calculate at this time the current minimum price the transaction is willing to pay

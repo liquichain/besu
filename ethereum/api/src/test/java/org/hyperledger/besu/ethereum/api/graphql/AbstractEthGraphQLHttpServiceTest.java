@@ -14,8 +14,6 @@
  */
 package org.hyperledger.besu.ethereum.api.graphql;
 
-import static org.mockito.Mockito.when;
-
 import org.hyperledger.besu.datatypes.Wei;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.api.ImmutableApiConfiguration;
@@ -29,6 +27,7 @@ import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.eth.EthProtocol;
 import org.hyperledger.besu.ethereum.eth.manager.EthScheduler;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransaction;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
 import org.hyperledger.besu.ethereum.mainnet.ValidationResult;
 import org.hyperledger.besu.ethereum.p2p.rlpx.wire.Capability;
@@ -84,20 +83,23 @@ public abstract class AbstractEthGraphQLHttpServiceTest {
   public void setupTest() throws Exception {
     final Synchronizer synchronizerMock = Mockito.mock(Synchronizer.class);
     final SyncStatus status = new DefaultSyncStatus(1, 2, 3, Optional.of(4L), Optional.of(5L));
-    when(synchronizerMock.getSyncStatus()).thenReturn(Optional.of(status));
+    Mockito.when(synchronizerMock.getSyncStatus()).thenReturn(Optional.of(status));
 
     final PoWMiningCoordinator miningCoordinatorMock = Mockito.mock(PoWMiningCoordinator.class);
-    when(miningCoordinatorMock.getMinTransactionGasPrice()).thenReturn(Wei.of(16));
+    Mockito.when(miningCoordinatorMock.getMinTransactionGasPrice()).thenReturn(Wei.of(16));
 
     final TransactionPool transactionPoolMock = Mockito.mock(TransactionPool.class);
 
-    when(transactionPoolMock.addTransactionViaApi(ArgumentMatchers.any(Transaction.class)))
+    Mockito.when(transactionPoolMock.addTransactionViaApi(ArgumentMatchers.any(Transaction.class)))
         .thenReturn(ValidationResult.valid());
     // nonce too low tests uses a tx with nonce=16
-    when(transactionPoolMock.addTransactionViaApi(
-            ArgumentMatchers.argThat(tx -> tx.getNonce() == 16)))
+    Mockito.when(
+            transactionPoolMock.addTransactionViaApi(
+                ArgumentMatchers.argThat(tx -> tx.getNonce() == 16)))
         .thenReturn(ValidationResult.invalid(TransactionInvalidReason.NONCE_TOO_LOW));
-    Mockito.when(transactionPoolMock.getPendingTransactions())
+    final PendingTransactions pendingTransactionsMock = Mockito.mock(PendingTransactions.class);
+    Mockito.when(transactionPoolMock.getPendingTransactions()).thenReturn(pendingTransactionsMock);
+    Mockito.when(pendingTransactionsMock.getPendingTransactions())
         .thenReturn(
             Collections.singleton(
                 new PendingTransaction.Local(

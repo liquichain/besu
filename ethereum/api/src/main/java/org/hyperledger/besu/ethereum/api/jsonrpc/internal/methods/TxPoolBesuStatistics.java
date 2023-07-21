@@ -20,16 +20,16 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcRespon
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcSuccessResponse;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.results.PendingTransactionsStatisticsResult;
 import org.hyperledger.besu.ethereum.eth.transactions.PendingTransaction;
-import org.hyperledger.besu.ethereum.eth.transactions.TransactionPool;
+import org.hyperledger.besu.ethereum.eth.transactions.PendingTransactions;
 
 import java.util.Collection;
 
 public class TxPoolBesuStatistics implements JsonRpcMethod {
 
-  private final TransactionPool transactionPool;
+  private final PendingTransactions pendingTransactions;
 
-  public TxPoolBesuStatistics(final TransactionPool transactionPool) {
-    this.transactionPool = transactionPool;
+  public TxPoolBesuStatistics(final PendingTransactions pendingTransactions) {
+    this.pendingTransactions = pendingTransactions;
   }
 
   @Override
@@ -44,11 +44,11 @@ public class TxPoolBesuStatistics implements JsonRpcMethod {
 
   private PendingTransactionsStatisticsResult statistics() {
     final Collection<PendingTransaction> pendingTransaction =
-        transactionPool.getPendingTransactions();
+        pendingTransactions.getPendingTransactions();
     final long localCount =
         pendingTransaction.stream().filter(PendingTransaction::isReceivedFromLocalSource).count();
     final long remoteCount = pendingTransaction.size() - localCount;
     return new PendingTransactionsStatisticsResult(
-        transactionPool.maxSize(), localCount, remoteCount);
+        pendingTransactions.maxSize(), localCount, remoteCount);
   }
 }

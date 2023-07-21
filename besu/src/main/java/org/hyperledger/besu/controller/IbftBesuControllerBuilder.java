@@ -146,7 +146,7 @@ public class IbftBesuControllerBuilder extends BftBesuControllerBuilder {
     final BftProtocolSchedule bftProtocolSchedule = (BftProtocolSchedule) protocolSchedule;
     final BftBlockCreatorFactory<?> blockCreatorFactory =
         new BftBlockCreatorFactory<>(
-            transactionPool,
+            transactionPool.getPendingTransactions(),
             protocolContext,
             bftProtocolSchedule,
             forksSchedule,
@@ -310,7 +310,7 @@ public class IbftBesuControllerBuilder extends BftBesuControllerBuilder {
                 block.getHeader().getCoinbase().equals(localAddress) ? "Produced" : "Imported",
                 block.getHeader().getNumber(),
                 block.getBody().getTransactions().size(),
-                transactionPool.count(),
+                transactionPool.getPendingTransactions().size(),
                 block.getHeader().getGasUsed(),
                 (block.getHeader().getGasUsed() * 100.0) / block.getHeader().getGasLimit(),
                 block.getHash().toHexString()));

@@ -184,7 +184,7 @@ public class QbftBesuControllerBuilder extends BftBesuControllerBuilder {
     final BftProtocolSchedule bftProtocolSchedule = (BftProtocolSchedule) protocolSchedule;
     final BftBlockCreatorFactory<?> blockCreatorFactory =
         new QbftBlockCreatorFactory(
-            transactionPool,
+            transactionPool.getPendingTransactions(),
             protocolContext,
             bftProtocolSchedule,
             qbftForksSchedule,
@@ -381,7 +381,7 @@ public class QbftBesuControllerBuilder extends BftBesuControllerBuilder {
                 block.getHeader().getCoinbase().equals(localAddress) ? "Produced" : "Imported",
                 block.getHeader().getNumber(),
                 block.getBody().getTransactions().size(),
-                transactionPool.count(),
+                transactionPool.getPendingTransactions().size(),
                 block.getHeader().getGasUsed(),
                 (block.getHeader().getGasUsed() * 100.0) / block.getHeader().getGasLimit(),
                 block.getHash().toHexString()));
