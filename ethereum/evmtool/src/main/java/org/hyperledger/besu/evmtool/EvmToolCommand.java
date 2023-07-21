@@ -43,6 +43,7 @@ import org.hyperledger.besu.evm.tracing.StandardJsonTracer;
 import org.hyperledger.besu.evm.worldstate.WorldState;
 import org.hyperledger.besu.evm.worldstate.WorldUpdater;
 import org.hyperledger.besu.metrics.MetricsSystemModule;
+import org.hyperledger.besu.util.LogConfigurator;
 
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
@@ -69,6 +70,8 @@ import io.vertx.core.json.JsonObject;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 import org.apache.tuweni.units.bigints.UInt256;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
@@ -94,6 +97,8 @@ import picocli.CommandLine.Option;
       T8nServerSubCommand.class
     })
 public class EvmToolCommand implements Runnable {
+
+  private static final Logger LOG = LoggerFactory.getLogger(EvmToolCommand.class);
 
   @Option(
       names = {"--code"},
@@ -283,6 +288,7 @@ public class EvmToolCommand implements Runnable {
 
   @Override
   public void run() {
+    LogConfigurator.setLevel("", "OFF");
     try {
       final EvmToolComponent component =
           DaggerEvmToolComponent.builder()
@@ -432,8 +438,7 @@ public class EvmToolCommand implements Runnable {
       } while (remainingIters-- > 0);
 
     } catch (final IOException e) {
-      System.err.println("Unable to create Genesis module");
-      e.printStackTrace(System.out);
+      LOG.error("Unable to create Genesis module", e);
     }
   }
 

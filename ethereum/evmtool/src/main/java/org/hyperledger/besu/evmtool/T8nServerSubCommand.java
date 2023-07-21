@@ -40,6 +40,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.jackson.DatabindCodec;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 import picocli.CommandLine;
@@ -92,7 +93,7 @@ public class T8nServerSubCommand implements Runnable {
                         }
                       }
 
-                      ObjectMapper objectMapper = JsonUtils.createObjectMapper();
+                      ObjectMapper objectMapper = DatabindCodec.mapper();
                       final T8nExecutor.T8nResult result =
                           T8nExecutor.runTest(
                               chainId,
@@ -110,9 +111,7 @@ public class T8nServerSubCommand implements Runnable {
                                 }
 
                                 @Override
-                                public void disposeTracer(final OperationTracer tracer) {
-                                  // No output streams to dispose of
-                                }
+                                public void disposeTracer(final OperationTracer tracer) {}
                               });
 
                       ObjectNode outputObject = objectMapper.createObjectNode();

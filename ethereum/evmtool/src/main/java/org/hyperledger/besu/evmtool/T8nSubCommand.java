@@ -34,6 +34,7 @@ import org.hyperledger.besu.evm.AccessListEntry;
 import org.hyperledger.besu.evm.tracing.OperationTracer;
 import org.hyperledger.besu.evm.tracing.StandardJsonTracer;
 import org.hyperledger.besu.plugin.data.TransactionType;
+import org.hyperledger.besu.util.LogConfigurator;
 
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -54,7 +55,10 @@ import java.util.Spliterators;
 import java.util.Stack;
 import java.util.stream.StreamSupport;
 
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
@@ -62,6 +66,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.IParameterConsumer;
 import picocli.CommandLine.Model.ArgSpec;
@@ -78,6 +84,7 @@ import picocli.CommandLine.ParentCommand;
     mixinStandardHelpOptions = true,
     versionProvider = VersionProvider.class)
 public class T8nSubCommand implements Runnable {
+  private static final Logger LOG = LoggerFactory.getLogger(T8nSubCommand.class);
 
   record RejectedTransaction(int index, String error) {}
 
@@ -182,8 +189,15 @@ public class T8nSubCommand implements Runnable {
 
   @Override
   public void run() {
-    final ObjectMapper objectMapper = JsonUtils.createObjectMapper();
+    LogConfigurator.setLevel("", "OFF");
+    final ObjectMapper objectMapper = new ObjectMapper();
+    objectMapper.setDefaultPrettyPrinter(
+        (new DefaultPrettyPrinter())
+            .withSpacesInObjectEntries()
+            .withObjectIndenter(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE.withIndent("  "))
+            .withArrayIndenter(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE.withIndent("  ")));
     final ObjectReader t8nReader = objectMapper.reader();
+    objectMapper.disable(Feature.AUTO_CLOSE_SOURCE);
 
     MutableWorldState initialWorldState;
     ReferenceTestEnv referenceTestEnv;
@@ -238,8 +252,7 @@ public class T8nSubCommand implements Runnable {
       jpe.printStackTrace();
       return;
     } catch (final IOException e) {
-      System.err.println("Unable to read state file");
-      e.printStackTrace(System.err);
+      LOG.error("Unable to read state file", e);
       return;
     }
 
@@ -336,8 +349,7 @@ public class T8nSubCommand implements Runnable {
         parentCommand.out.println(writer.writeValueAsString(outputObject));
       }
     } catch (IOException ioe) {
-      System.err.println("Could not write results");
-      ioe.printStackTrace(System.err);
+      LOG.error("Could not write results", ioe);
     }
   }
 

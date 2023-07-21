@@ -21,8 +21,6 @@ import org.hyperledger.besu.ethereum.rlp.RLPOutput;
 import java.util.List;
 import java.util.Objects;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import org.apache.tuweni.bytes.Bytes;
@@ -44,11 +42,7 @@ public class Log {
    * @param data Data associated with this log.
    * @param topics Indexable topics associated with this log.
    */
-  @JsonCreator
-  public Log(
-      @JsonProperty("logger") final Address logger,
-      @JsonProperty("data") final Bytes data,
-      @JsonProperty("topics") final List<LogTopic> topics) {
+  public Log(final Address logger, final Bytes data, final List<LogTopic> topics) {
     this.logger = logger;
     this.data = data;
     this.topics = ImmutableList.copyOf(topics);
@@ -87,7 +81,6 @@ public class Log {
    *
    * @return the logger
    */
-  @JsonProperty("logger")
   public Address getLogger() {
     return logger;
   }
@@ -97,7 +90,6 @@ public class Log {
    *
    * @return the data
    */
-  @JsonProperty("data")
   public Bytes getData() {
     return data;
   }
@@ -107,16 +99,16 @@ public class Log {
    *
    * @return the topics
    */
-  @JsonProperty("topics")
   public List<LogTopic> getTopics() {
     return topics;
   }
 
   @Override
   public boolean equals(final Object other) {
-    if (!(other instanceof Log that)) return false;
+    if (!(other instanceof Log)) return false;
 
     // Compare data
+    final Log that = (Log) other;
     return this.data.equals(that.data)
         && this.logger.equals(that.logger)
         && this.topics.equals(that.topics);
