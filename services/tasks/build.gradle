@@ -38,7 +38,7 @@ dependencies {
 
   implementation 'com.google.guava:guava'
   implementation 'io.vertx:vertx-core'
-  implementation 'io.tmio:tuweni-bytes'
+  implementation 'org.apache.tuweni:tuweni-bytes'
 
   testImplementation 'org.assertj:assertj-core'
   testImplementation 'org.junit.jupiter:junit-jupiter'
