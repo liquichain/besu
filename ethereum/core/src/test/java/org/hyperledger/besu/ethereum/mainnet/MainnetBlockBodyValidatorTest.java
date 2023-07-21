@@ -45,11 +45,9 @@ class MainnetBlockBodyValidatorTest {
   private final BlockchainSetupUtil blockchainSetupUtil = BlockchainSetupUtil.forMainnet();
   private final List<Withdrawal> withdrawals =
       List.of(new Withdrawal(UInt64.ONE, UInt64.ONE, Address.ZERO, GWei.ONE));
-
   @Mock private ProtocolSchedule protocolSchedule;
   @Mock private ProtocolSpec protocolSpec;
   @Mock private WithdrawalsValidator withdrawalsValidator;
-  @Mock private DepositsValidator depositsValidator;
 
   @Test
   void validatesWithdrawals() {
@@ -69,11 +67,8 @@ class MainnetBlockBodyValidatorTest {
 
     when(protocolSchedule.getByBlockHeader(any())).thenReturn(protocolSpec);
     when(protocolSpec.getWithdrawalsValidator()).thenReturn(withdrawalsValidator);
-    when(protocolSpec.getDepositsValidator()).thenReturn(depositsValidator);
     when(withdrawalsValidator.validateWithdrawals(Optional.of(withdrawals))).thenReturn(true);
     when(withdrawalsValidator.validateWithdrawalsRoot(block)).thenReturn(true);
-    when(depositsValidator.validateDeposits(any(), any())).thenReturn(true);
-    when(depositsValidator.validateDepositsRoot(block)).thenReturn(true);
 
     assertThat(
             new MainnetBlockBodyValidator(protocolSchedule)

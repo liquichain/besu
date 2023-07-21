@@ -20,7 +20,6 @@ import static org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.Executi
 import static org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.ExecutionEngineJsonRpcMethod.EngineStatus.INVALID_BLOCK_HASH;
 import static org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.ExecutionEngineJsonRpcMethod.EngineStatus.SYNCING;
 import static org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.ExecutionEngineJsonRpcMethod.EngineStatus.VALID;
-import static org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.engine.DepositsValidatorProvider.getDepositsValidator;
 import static org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.engine.WithdrawalsValidatorProvider.getWithdrawalsValidator;
 import static org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError.INVALID_PARAMS;
 
@@ -31,7 +30,6 @@ import org.hyperledger.besu.ethereum.BlockProcessingResult;
 import org.hyperledger.besu.ethereum.ProtocolContext;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.JsonRpcRequestContext;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.methods.ExecutionEngineJsonRpcMethod;
-import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.DepositParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.EnginePayloadParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.parameters.WithdrawalParameter;
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcError;
@@ -43,7 +41,6 @@ import org.hyperledger.besu.ethereum.core.Block;
 import org.hyperledger.besu.ethereum.core.BlockBody;
 import org.hyperledger.besu.ethereum.core.BlockHeader;
 import org.hyperledger.besu.ethereum.core.BlockHeaderFunctions;
-import org.hyperledger.besu.ethereum.core.Deposit;
 import org.hyperledger.besu.ethereum.core.Difficulty;
 import org.hyperledger.besu.ethereum.core.Transaction;
 import org.hyperledger.besu.ethereum.core.Withdrawal;
@@ -114,15 +111,6 @@ public abstract class AbstractEngineNewPayload extends ExecutionEngineJsonRpcMet
       return new JsonRpcErrorResponse(reqId, INVALID_PARAMS);
     }
 
-    final Optional<List<Deposit>> maybeDeposits =
-        Optional.ofNullable(blockParam.getDeposits())
-            .map(ds -> ds.stream().map(DepositParameter::toDeposit).collect(toList()));
-    if (!getDepositsValidator(
-            protocolSchedule, blockParam.getTimestamp(), blockParam.getBlockNumber())
-        .validateDepositParameter(maybeDeposits)) {
-      return new JsonRpcErrorResponse(reqId, INVALID_PARAMS);
-    }
-
     if (mergeContext.get().isSyncing()) {
       LOG.debug("We are syncing");
       return respondWith(reqId, blockParam, null, SYNCING);
@@ -173,7 +161,7 @@ public abstract class AbstractEngineNewPayload extends ExecutionEngineJsonRpcMet
             0,
             maybeWithdrawals.map(BodyValidation::withdrawalsRoot).orElse(null),
             null,
-            maybeDeposits.map(BodyValidation::depositsRoot).orElse(null),
+            null,
             headerFunctions);
 
     // ensure the block hash matches the blockParam hash
@@ -217,7 +205,8 @@ public abstract class AbstractEngineNewPayload extends ExecutionEngineJsonRpcMet
     final var block =
         new Block(
             newBlockHeader,
-            new BlockBody(transactions, Collections.emptyList(), maybeWithdrawals, maybeDeposits));
+            new BlockBody(
+                transactions, Collections.emptyList(), maybeWithdrawals, Optional.empty()));
 
     if (maybeParentHeader.isEmpty()) {
       LOG.atDebug()
@@ -350,10 +339,6 @@ public abstract class AbstractEngineNewPayload extends ExecutionEngineJsonRpcMet
     if (block.getBody().getWithdrawals().isPresent()) {
       message.append(" / %d ws");
       messageArgs.add(block.getBody().getWithdrawals().get().size());
-    }
-    if (block.getBody().getDeposits().isPresent()) {
-      message.append(" / %d ds");
-      messageArgs.add(block.getBody().getDeposits().get().size());
     }
     message.append(" / base fee %s / %,d (%01.1f%%) gas / (%s) in %01.3fs. Peers: %d");
     messageArgs.addAll(

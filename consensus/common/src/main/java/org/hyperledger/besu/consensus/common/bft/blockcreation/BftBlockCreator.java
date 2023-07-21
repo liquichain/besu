@@ -76,8 +76,7 @@ public class BftBlockCreator extends AbstractBlockCreator {
         protocolSchedule,
         minTransactionGasPrice,
         minBlockOccupancyRatio,
-        parentHeader,
-        Optional.empty());
+        parentHeader);
     this.bftExtraDataCodec = bftExtraDataCodec;
   }
 

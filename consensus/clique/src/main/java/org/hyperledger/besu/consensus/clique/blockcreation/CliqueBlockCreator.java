@@ -83,8 +83,7 @@ public class CliqueBlockCreator extends AbstractBlockCreator {
         protocolSchedule,
         minTransactionGasPrice,
         minBlockOccupancyRatio,
-        parentHeader,
-        Optional.empty());
+        parentHeader);
     this.nodeKey = nodeKey;
     this.epochManager = epochManager;
   }

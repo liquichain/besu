@@ -98,9 +98,6 @@ public abstract class MainnetProtocolSpecs {
 
   private static final Wei CONSTANTINOPLE_BLOCK_REWARD = Wei.fromEth(2);
 
-  public static final Address DEFAULT_DEPOSIT_CONTRACT_ADDRESS =
-      Address.fromHexString("0x00000000219ab540356cbb839cbe05303d7705fa");
-
   private MainnetProtocolSpecs() {}
 
   public static ProtocolSpecBuilder frontierDefinition(
@@ -750,9 +747,6 @@ public abstract class MainnetProtocolSpecs {
       final GenesisConfigOptions genesisConfigOptions,
       final EvmConfiguration evmConfiguration) {
 
-    final Address depositContractAddress =
-        genesisConfigOptions.getDepositContractAddress().orElse(DEFAULT_DEPOSIT_CONTRACT_ADDRESS);
-
     return futureEipsDefinition(
             chainId,
             configContractSizeLimit,
@@ -764,7 +758,7 @@ public abstract class MainnetProtocolSpecs {
             (gasCalculator, jdCacheConfig) ->
                 MainnetEVMs.experimentalEips(
                     gasCalculator, chainId.orElse(BigInteger.ZERO), evmConfiguration))
-        .depositsValidator(new DepositsValidator.AllowedDeposits(depositContractAddress))
+        .depositsValidator(new DepositsValidator.AllowedDeposits())
         .name("ExperimentalEips");
   }
 
