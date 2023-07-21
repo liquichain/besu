@@ -21,6 +21,8 @@ import org.hyperledger.besu.evm.frame.ExceptionalHaltReason;
 import org.hyperledger.besu.evm.frame.MessageFrame;
 import org.hyperledger.besu.evm.gascalculator.GasCalculator;
 
+import org.apache.tuweni.bytes.Bytes;
+
 /** The Memory copy operation. */
 public class MCopyOperation extends AbstractOperation {
 
@@ -44,7 +46,10 @@ public class MCopyOperation extends AbstractOperation {
       return new OperationResult(cost, ExceptionalHaltReason.INSUFFICIENT_GAS);
     }
 
-    frame.copyMemory(dst, src, length, true);
+    // read memory copies into a new buffer, no need to copy here.
+    final Bytes callData = frame.readMemory(src, length);
+
+    frame.writeMemory(dst, length, callData, true);
 
     return new OperationResult(cost, null);
   }
