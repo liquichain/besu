@@ -24,7 +24,7 @@ import org.hyperledger.besu.datatypes.Address;
 import java.util.Map;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class JsonBftConfigOptionsTest {
 

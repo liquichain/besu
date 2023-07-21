@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.io.Resources;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class JsonGenesisConfigOptionsTest {
 
