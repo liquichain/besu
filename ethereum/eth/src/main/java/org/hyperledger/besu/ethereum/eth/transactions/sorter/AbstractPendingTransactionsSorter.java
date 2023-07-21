@@ -541,9 +541,7 @@ public abstract class AbstractPendingTransactionsSorter implements PendingTransa
 
   @Override
   public void signalInvalidAndRemoveDependentTransactions(final Transaction transaction) {
-    synchronized (lock) {
-      signalInvalidAndGetDependentTransactions(transaction).forEach(this::removeTransaction);
-    }
+    signalInvalidAndGetDependentTransactions(transaction).forEach(this::removeTransaction);
   }
 
   @Override
