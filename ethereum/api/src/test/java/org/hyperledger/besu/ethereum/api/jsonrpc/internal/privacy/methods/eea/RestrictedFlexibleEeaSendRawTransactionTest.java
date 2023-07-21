@@ -139,8 +139,7 @@ public class RestrictedFlexibleEeaSendRawTransactionTest extends BaseEeaSendRawT
 
     final JsonRpcResponse expectedResponse =
         new JsonRpcErrorResponse(
-            validPrivacyGroupTransactionRequest.getRequest().getId(),
-            JsonRpcError.UNSUPPORTED_PRIVATE_TRANSACTION_TYPE);
+            validPrivacyGroupTransactionRequest.getRequest().getId(), JsonRpcError.INVALID_PARAMS);
 
     assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse);
   }
@@ -153,8 +152,7 @@ public class RestrictedFlexibleEeaSendRawTransactionTest extends BaseEeaSendRawT
 
     final JsonRpcResponse expectedResponse =
         new JsonRpcErrorResponse(
-            validPrivacyGroupTransactionRequest.getRequest().getId(),
-            JsonRpcError.UNSUPPORTED_PRIVATE_TRANSACTION_TYPE);
+            validPrivacyGroupTransactionRequest.getRequest().getId(), JsonRpcError.INVALID_PARAMS);
 
     assertThat(actualResponse).usingRecursiveComparison().isEqualTo(expectedResponse);
   }
