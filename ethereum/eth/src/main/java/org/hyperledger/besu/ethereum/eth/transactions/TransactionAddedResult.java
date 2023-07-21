@@ -46,8 +46,6 @@ public final class TransactionAddedResult {
 
   public static final TransactionAddedResult INTERNAL_ERROR =
       new TransactionAddedResult(Status.INTERNAL_ERROR);
-  public static final TransactionAddedResult DISABLED =
-      new TransactionAddedResult(TransactionInvalidReason.TX_POOL_DISABLED);
 
   private final Optional<TransactionInvalidReason> rejectReason;
 

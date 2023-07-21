@@ -35,11 +35,7 @@ public class TransactionPoolEvictionService {
         Optional.of(
             vertx.setPeriodic(
                 TimeUnit.MINUTES.toMillis(1),
-                id -> {
-                  if (transactionPool.isEnabled()) {
-                    transactionPool.getPendingTransactions().evictOldTransactions();
-                  }
-                }));
+                id -> transactionPool.getPendingTransactions().evictOldTransactions()));
   }
 
   public void stop() {
