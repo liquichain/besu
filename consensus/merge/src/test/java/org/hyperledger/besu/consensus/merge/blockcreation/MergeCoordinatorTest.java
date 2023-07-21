@@ -88,20 +88,17 @@ import com.google.common.base.Suppliers;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 import org.apache.tuweni.units.bigints.UInt256;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
+@RunWith(MockitoJUnitRunner.class)
 public class MergeCoordinatorTest implements MergeGenesisConfigHelper {
 
   private static final com.google.common.base.Supplier<SignatureAlgorithm> SIGNATURE_ALGORITHM =
@@ -166,7 +163,7 @@ public class MergeCoordinatorTest implements MergeGenesisConfigHelper {
 
   private final BadBlockManager badBlockManager = spy(new BadBlockManager());
 
-  @BeforeEach
+  @Before
   public void setUp() {
     when(mergeContext.as(MergeContext.class)).thenReturn(mergeContext);
     when(mergeContext.getTerminalTotalDifficulty())
@@ -819,7 +816,7 @@ public class MergeCoordinatorTest implements MergeGenesisConfigHelper {
         prevParent, genesisState.getBlock().getHash(), genesisState.getBlock().getHash());
     Hash expectedCommonAncestor = blockchain.getBlockHeader(2).get().getBlockHash();
 
-    // generate from 3' down to some other head. Remember those.
+    // generate from 3' down to some other head. Remeber those.
     BlockHeader forkPoint = blockchain.getBlockHeader(2).get();
     prevParent = forkPoint;
     for (int i = 3; i <= 5; i++) {

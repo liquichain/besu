@@ -30,7 +30,7 @@ import org.hyperledger.besu.evm.operation.Push0Operation;
 
 import java.math.BigInteger;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class MergeProtocolScheduleTest {
 

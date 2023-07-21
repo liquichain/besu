@@ -48,16 +48,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
+@RunWith(MockitoJUnitRunner.class)
 public class MergeReorgTest implements MergeGenesisConfigHelper {
 
   @Mock PendingTransactions mockPendingTransactions;
@@ -80,7 +77,7 @@ public class MergeReorgTest implements MergeGenesisConfigHelper {
   private final BaseFeeMarket feeMarket =
       new LondonFeeMarket(0, genesisState.getBlock().getHeader().getBaseFee());
 
-  @BeforeEach
+  @Before
   public void setUp() {
     var mutable = worldStateArchive.getMutable();
     genesisState.writeStateTo(mutable);
