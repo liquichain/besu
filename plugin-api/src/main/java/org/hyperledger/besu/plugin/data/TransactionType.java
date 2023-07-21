@@ -12,7 +12,7 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.hyperledger.besu.datatypes;
+package org.hyperledger.besu.plugin.data;
 
 import java.util.Arrays;
 import java.util.EnumSet;

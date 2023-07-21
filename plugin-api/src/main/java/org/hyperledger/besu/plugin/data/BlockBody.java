@@ -16,7 +16,6 @@
 
 package org.hyperledger.besu.plugin.data;
 
-import org.hyperledger.besu.datatypes.Transaction;
 import org.hyperledger.besu.plugin.Unstable;
 
 import java.util.List;

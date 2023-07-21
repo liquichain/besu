@@ -12,7 +12,12 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-package org.hyperledger.besu.datatypes;
+package org.hyperledger.besu.plugin.data;
+
+import org.hyperledger.besu.datatypes.Address;
+import org.hyperledger.besu.datatypes.Hash;
+import org.hyperledger.besu.datatypes.Quantity;
+import org.hyperledger.besu.plugin.Unstable;
 
 import java.math.BigInteger;
 import java.util.Optional;
@@ -59,6 +64,7 @@ public interface Transaction {
    *
    * @return the quantity of Wei for max fee per gas
    */
+  @Unstable
   default Optional<? extends Quantity> getMaxPriorityFeePerGas() {
     return Optional.empty();
   }
@@ -68,6 +74,7 @@ public interface Transaction {
    *
    * @return the quantity of Wei for fee cap.
    */
+  @Unstable
   default Optional<? extends Quantity> getMaxFeePerGas() {
     return Optional.empty();
   }
@@ -78,6 +85,7 @@ public interface Transaction {
    *
    * @return the quantity of Wei for fee per data gas.
    */
+  @Unstable
   default Optional<? extends Quantity> getMaxFeePerDataGas() {
     return Optional.empty();
   }
@@ -182,5 +190,6 @@ public interface Transaction {
    *
    * @return the type of the transaction
    */
+  @Unstable
   TransactionType getType();
 }
