@@ -95,9 +95,8 @@ public abstract class AbstractGetHeadersFromPeerTask
     BlockHeader prevBlockHeader = firstHeader;
     updatePeerChainState(peer, firstHeader);
     final int expectedDelta = reverse ? -(skip + 1) : (skip + 1);
-    BlockHeader header = null;
     for (int i = 1; i < headers.size(); i++) {
-      header = headers.get(i);
+      final BlockHeader header = headers.get(i);
       if (header.getNumber() != prevBlockHeader.getNumber() + expectedDelta) {
         // Skip doesn't match, this isn't our data
         LOG.debug("header not matching the expected number. Peer: {}", peer);
@@ -117,11 +116,6 @@ public abstract class AbstractGetHeadersFromPeerTask
       }
       prevBlockHeader = header;
       headersList.add(header);
-    }
-    // if we have received more than one header we have to update the chain state with the last
-    // header as well, as the header with the highest block number can be the first or the last
-    // header.
-    if (headers.size() > 1) {
       updatePeerChainState(peer, header);
     }
 
