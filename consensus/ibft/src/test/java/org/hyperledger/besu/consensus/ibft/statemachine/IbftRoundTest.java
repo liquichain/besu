@@ -21,7 +21,6 @@ import static org.hyperledger.besu.consensus.common.bft.BftContextBuilder.setupC
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -65,15 +64,15 @@ import java.util.Collections;
 import java.util.Optional;
 
 import org.apache.tuweni.bytes.Bytes;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class IbftRoundTest {
 
   private final NodeKey nodeKey = NodeKeyUtils.generate();
@@ -101,7 +100,7 @@ public class IbftRoundTest {
       SignatureAlgorithmFactory.getInstance()
           .createSignature(BigInteger.ONE, BigInteger.ONE, (byte) 1);
 
-  @BeforeEach
+  @Before
   public void setup() {
     protocolContext =
         new ProtocolContext(
@@ -110,9 +109,9 @@ public class IbftRoundTest {
             setupContextWithBftExtraDataEncoder(emptyList(), new IbftExtraDataCodec()),
             Optional.empty());
 
-    lenient().when(messageValidator.validateProposal(any())).thenReturn(true);
-    lenient().when(messageValidator.validatePrepare(any())).thenReturn(true);
-    lenient().when(messageValidator.validateCommit(any())).thenReturn(true);
+    when(messageValidator.validateProposal(any())).thenReturn(true);
+    when(messageValidator.validatePrepare(any())).thenReturn(true);
+    when(messageValidator.validateCommit(any())).thenReturn(true);
 
     proposedExtraData =
         new BftExtraData(Bytes.wrap(new byte[32]), emptyList(), empty(), 0, emptyList());
@@ -123,13 +122,10 @@ public class IbftRoundTest {
     final BlockHeader header = headerTestFixture.buildHeader();
     proposedBlock = new Block(header, new BlockBody(emptyList(), emptyList()));
 
-    lenient()
-        .when(blockCreator.createBlock(anyLong()))
+    when(blockCreator.createBlock(anyLong()))
         .thenReturn(new BlockCreationResult(proposedBlock, new TransactionSelectionResults()));
 
-    lenient()
-        .when(blockImporter.importBlock(any(), any(), any()))
-        .thenReturn(new BlockImportResult(true));
+    when(blockImporter.importBlock(any(), any(), any())).thenReturn(new BlockImportResult(true));
 
     subscribers.subscribe(minedBlockObserver);
   }

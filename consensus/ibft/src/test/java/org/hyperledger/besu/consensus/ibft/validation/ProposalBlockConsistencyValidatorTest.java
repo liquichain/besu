@@ -31,12 +31,12 @@ import org.hyperledger.besu.ethereum.core.Block;
 import java.util.Collections;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ProposalBlockConsistencyValidatorTest {
 
   private final MessageFactory proposerMessageFactory = new MessageFactory(NodeKeyUtils.generate());
@@ -51,7 +51,7 @@ public class ProposalBlockConsistencyValidatorTest {
           Collections.emptyList(), roundIdentifier, bftExtraDataCodec);
   private ProposalBlockConsistencyValidator consistencyChecker;
 
-  @BeforeEach
+  @Before
   public void setup() {
 
     consistencyChecker = new ProposalBlockConsistencyValidator();

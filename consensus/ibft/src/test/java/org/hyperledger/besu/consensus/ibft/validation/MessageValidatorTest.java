@@ -18,7 +18,6 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -48,14 +47,14 @@ import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.util.Lists;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class MessageValidatorTest {
 
   private final NodeKey nodeKey = NodeKeyUtils.generate();
@@ -82,7 +81,7 @@ public class MessageValidatorTest {
 
   private final Block block = ProposedBlockHelpers.createProposalBlock(validators, roundIdentifier);
 
-  @BeforeEach
+  @Before
   public void setup() {
     when(signedDataValidator.validateProposal(any())).thenReturn(true);
     when(signedDataValidator.validatePrepare(any())).thenReturn(true);
@@ -92,7 +91,7 @@ public class MessageValidatorTest {
         .thenReturn(true);
 
     BftContext mockBftCtx = mock(BftContext.class);
-    lenient().when(mockBftCtx.as(Mockito.any())).thenReturn(mockBftCtx);
+    when(mockBftCtx.as(Mockito.any())).thenReturn(mockBftCtx);
 
     protocolContext =
         new ProtocolContext(

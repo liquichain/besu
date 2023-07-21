@@ -30,13 +30,13 @@ import java.util.List;
 import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class IbftGetValidatorsByBlockHashTest {
 
   private static final String ETH_METHOD = "ibft_getValidatorsByBlockHash";
@@ -50,7 +50,7 @@ public class IbftGetValidatorsByBlockHashTest {
 
   private IbftGetValidatorsByBlockHash method;
 
-  @BeforeEach
+  @Before
   public void setUp() {
     method = new IbftGetValidatorsByBlockHash(blockchain, bftBlockInterface);
   }

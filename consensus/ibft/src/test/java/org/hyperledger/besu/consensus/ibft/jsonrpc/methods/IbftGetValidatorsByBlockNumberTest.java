@@ -29,13 +29,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class IbftGetValidatorsByBlockNumberTest {
 
   @Mock private BlockchainQueries blockchainQueries;
@@ -45,7 +45,7 @@ public class IbftGetValidatorsByBlockNumberTest {
 
   private IbftGetValidatorsByBlockNumber method;
 
-  @BeforeEach
+  @Before
   public void setUp() {
     method = new IbftGetValidatorsByBlockNumber(blockchainQueries, bftBlockInterface);
   }

@@ -33,20 +33,20 @@ import org.hyperledger.besu.ethereum.p2p.rlpx.wire.MessageData;
 
 import java.util.function.Function;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class IbftGossipTest {
   private IbftGossip ibftGossip;
   @Mock private ValidatorMulticaster validatorMulticaster;
   private PeerConnection peerConnection;
   private static final Address senderAddress = AddressHelpers.ofValue(9);
 
-  @BeforeEach
+  @Before
   public void setup() {
     ibftGossip = new IbftGossip(validatorMulticaster);
     peerConnection = MockPeerFactory.create(senderAddress);

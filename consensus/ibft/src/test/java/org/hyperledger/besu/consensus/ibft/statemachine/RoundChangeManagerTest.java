@@ -46,8 +46,8 @@ import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 public class RoundChangeManagerTest {
 
@@ -67,7 +67,7 @@ public class RoundChangeManagerTest {
   private final BftBlockInterface bftBlockInterface =
       new BftBlockInterface(new IbftExtraDataCodec());
 
-  @BeforeEach
+  @Before
   public void setup() {
 
     validators.add(Util.publicKeyToAddress(proposerKey.getPublicKey()));

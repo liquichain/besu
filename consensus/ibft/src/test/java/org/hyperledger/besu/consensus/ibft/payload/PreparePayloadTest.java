@@ -24,7 +24,7 @@ import org.hyperledger.besu.ethereum.rlp.RLP;
 import org.hyperledger.besu.ethereum.rlp.RLPInput;
 
 import org.apache.tuweni.bytes.Bytes;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class PreparePayloadTest {
 

@@ -26,7 +26,7 @@ import org.hyperledger.besu.consensus.ibft.messagewrappers.RoundChange;
 import org.hyperledger.besu.consensus.ibft.payload.MessageFactory;
 import org.hyperledger.besu.cryptoservices.NodeKeyUtils;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class RoundChangeMessageValidatorTest {
 

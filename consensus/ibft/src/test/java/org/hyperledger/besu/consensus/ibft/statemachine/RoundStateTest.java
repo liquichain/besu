@@ -16,7 +16,6 @@ package org.hyperledger.besu.consensus.ibft.statemachine;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -45,13 +44,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class RoundStateTest {
 
   private final List<NodeKey> validatorKeys = Lists.newArrayList();
@@ -66,7 +65,7 @@ public class RoundStateTest {
 
   @Mock private Block block;
 
-  @BeforeEach
+  @Before
   public void setup() {
     for (int i = 0; i < 3; i++) {
       final NodeKey newNodeKey = NodeKeyUtils.generate();
@@ -74,7 +73,7 @@ public class RoundStateTest {
       validators.add(Util.publicKeyToAddress(newNodeKey.getPublicKey()));
       validatorMessageFactories.add(new MessageFactory(newNodeKey));
     }
-    lenient().when(block.getHash()).thenReturn(blockHash);
+    when(block.getHash()).thenReturn(blockHash);
   }
 
   @Test

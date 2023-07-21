@@ -16,7 +16,7 @@ package org.hyperledger.besu.consensus.ibft.protocol;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class IbftSubProtocolTest {
 

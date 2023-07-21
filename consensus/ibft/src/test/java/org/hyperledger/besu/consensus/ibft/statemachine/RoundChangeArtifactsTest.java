@@ -31,8 +31,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.Lists;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 public class RoundChangeArtifactsTest {
 
@@ -41,7 +41,7 @@ public class RoundChangeArtifactsTest {
   private final long chainHeight = 5;
   private final ConsensusRoundIdentifier targetRound = new ConsensusRoundIdentifier(chainHeight, 5);
 
-  @BeforeEach
+  @Before
   public void setup() {
     for (int i = 0; i < 4; i++) {
       final NodeKey nodeKey = NodeKeyUtils.generate();

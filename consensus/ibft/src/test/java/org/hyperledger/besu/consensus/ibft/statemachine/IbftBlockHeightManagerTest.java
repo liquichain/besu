@@ -23,7 +23,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -79,15 +78,15 @@ import java.util.Optional;
 import com.google.common.collect.Lists;
 import org.apache.tuweni.bytes.Bytes;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class IbftBlockHeightManagerTest {
 
   private final NodeKey nodeKey = NodeKeyUtils.generate();
@@ -127,7 +126,7 @@ public class IbftBlockHeightManagerTest {
     createdBlock = new Block(header, new BlockBody(emptyList(), emptyList()));
   }
 
-  @BeforeEach
+  @Before
   public void setup() {
     for (int i = 0; i < 3; i++) {
       final NodeKey nodeKey = NodeKeyUtils.generate();
@@ -138,24 +137,19 @@ public class IbftBlockHeightManagerTest {
     buildCreatedBlock();
 
     final MessageValidator messageValidator = mock(MessageValidator.class);
-    lenient().when(messageValidator.validateProposal(any())).thenReturn(true);
-    lenient().when(messageValidator.validateCommit(any())).thenReturn(true);
-    lenient().when(messageValidator.validatePrepare(any())).thenReturn(true);
+    when(messageValidator.validateProposal(any())).thenReturn(true);
+    when(messageValidator.validateCommit(any())).thenReturn(true);
+    when(messageValidator.validatePrepare(any())).thenReturn(true);
     when(finalState.getBlockTimer()).thenReturn(blockTimer);
-    lenient().when(finalState.getQuorum()).thenReturn(3);
+    when(finalState.getQuorum()).thenReturn(3);
     when(finalState.getValidatorMulticaster()).thenReturn(validatorMulticaster);
-    lenient()
-        .when(blockCreator.createBlock(anyLong()))
+    when(blockCreator.createBlock(anyLong()))
         .thenReturn(new BlockCreationResult(createdBlock, new TransactionSelectionResults()));
 
-    lenient()
-        .when(futureRoundProposalMessageValidator.validateProposalMessage(any()))
-        .thenReturn(true);
+    when(futureRoundProposalMessageValidator.validateProposalMessage(any())).thenReturn(true);
     when(messageValidatorFactory.createFutureRoundProposalMessageValidator(anyLong(), any()))
         .thenReturn(futureRoundProposalMessageValidator);
-    lenient()
-        .when(messageValidatorFactory.createMessageValidator(any(), any()))
-        .thenReturn(messageValidator);
+    when(messageValidatorFactory.createMessageValidator(any(), any())).thenReturn(messageValidator);
 
     protocolContext =
         new ProtocolContext(null, null, setupContextWithValidators(validators), Optional.empty());
@@ -180,8 +174,7 @@ public class IbftBlockHeightManagerTest {
                   bftExtraDataCodec);
             });
 
-    lenient()
-        .when(roundFactory.createNewRoundWithState(any(), any()))
+    when(roundFactory.createNewRoundWithState(any(), any()))
         .thenAnswer(
             invocation -> {
               final RoundState providedRoundState = invocation.getArgument(1);

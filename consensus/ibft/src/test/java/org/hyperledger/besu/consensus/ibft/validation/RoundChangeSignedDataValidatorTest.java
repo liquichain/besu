@@ -41,8 +41,8 @@ import java.util.List;
 import java.util.Optional;
 
 import com.google.common.collect.Lists;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 @SuppressWarnings("DirectInvocationOnMock")
 public class RoundChangeSignedDataValidatorTest {
@@ -69,7 +69,7 @@ public class RoundChangeSignedDataValidatorTest {
   private final RoundChangePayloadValidator validator =
       new RoundChangePayloadValidator(validatorFactory, validators, 1, chainHeight);
 
-  @BeforeEach
+  @Before
   public void setup() {
     validators.add(Util.publicKeyToAddress(proposerKey.getPublicKey()));
     validators.add(Util.publicKeyToAddress(validatorKey.getPublicKey()));
