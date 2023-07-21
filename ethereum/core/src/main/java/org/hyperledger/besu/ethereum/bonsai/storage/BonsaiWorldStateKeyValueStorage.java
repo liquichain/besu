@@ -87,7 +87,7 @@ public class BonsaiWorldStateKeyValueStorage implements WorldStateStorage, AutoC
     this.trieLogStorage =
         provider.getStorageBySegmentIdentifier(KeyValueSegmentIdentifier.TRIE_LOG_STORAGE);
     this.metricsSystem = metricsSystem;
-    loadFlatDbStrategy();
+    initFlatDbStrategy();
   }
 
   public BonsaiWorldStateKeyValueStorage(
@@ -109,7 +109,7 @@ public class BonsaiWorldStateKeyValueStorage implements WorldStateStorage, AutoC
     this.metricsSystem = metricsSystem;
   }
 
-  public void loadFlatDbStrategy() {
+  public void initFlatDbStrategy() {
     this.flatDbMode =
         FlatDbMode.fromVersion(
             trieBranchStorage
@@ -275,14 +275,14 @@ public class BonsaiWorldStateKeyValueStorage implements WorldStateStorage, AutoC
     final KeyValueStorageTransaction transaction = trieBranchStorage.startTransaction();
     transaction.put(FLAT_DB_MODE, FlatDbMode.FULL.getVersion().toArrayUnsafe());
     transaction.commit();
-    loadFlatDbStrategy(); // force reload of flat db reader strategy
+    initFlatDbStrategy(); // force reload of flat db reader strategy
   }
 
   public void downgradeToPartialFlatDbMode() {
     final KeyValueStorageTransaction transaction = trieBranchStorage.startTransaction();
     transaction.put(FLAT_DB_MODE, FlatDbMode.PARTIAL.getVersion().toArrayUnsafe());
     transaction.commit();
-    loadFlatDbStrategy(); // force reload of flat db reader strategy
+    initFlatDbStrategy(); // force reload of flat db reader strategy
   }
 
   @Override
@@ -291,7 +291,7 @@ public class BonsaiWorldStateKeyValueStorage implements WorldStateStorage, AutoC
     getFlatDbReaderStrategy().clearAll(accountStorage, storageStorage, codeStorage);
     trieBranchStorage.clear();
     trieLogStorage.clear();
-    loadFlatDbStrategy(); // force reload of flat db reader strategy
+    flatDbReaderStrategy = null; // force reload of flat db reader strategy
   }
 
   @Override
