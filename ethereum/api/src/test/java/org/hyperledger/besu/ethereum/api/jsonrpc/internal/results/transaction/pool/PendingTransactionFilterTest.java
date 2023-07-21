@@ -45,7 +45,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class PendingPermissionTransactionFilterTest {
+public class PendingTransactionFilterTest {
 
   @Parameterized.Parameters
   public static Collection<Object[]> data() {
@@ -97,7 +97,7 @@ public class PendingPermissionTransactionFilterTest {
   private final int limit;
   private final List<String> expectedListOfTransactionHash;
 
-  public PendingPermissionTransactionFilterTest(
+  public PendingTransactionFilterTest(
       final List<Filter> filters,
       final int limit,
       final List<String> expectedListOfTransactionHash) {

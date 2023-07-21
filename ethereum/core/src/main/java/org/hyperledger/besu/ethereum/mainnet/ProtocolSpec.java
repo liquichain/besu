@@ -38,7 +38,7 @@ public class ProtocolSpec {
 
   private final GasLimitCalculator gasLimitCalculator;
 
-  private final TransactionValidator transactionValidator;
+  private final MainnetTransactionValidator transactionValidator;
 
   private final MainnetTransactionProcessor transactionProcessor;
 
@@ -81,7 +81,6 @@ public class ProtocolSpec {
   private final DepositsValidator depositsValidator;
 
   private final boolean isPoS;
-  private final boolean isReplayProtectionSupported;
   /**
    * Creates a new protocol specification instance.
    *
@@ -112,13 +111,11 @@ public class ProtocolSpec {
    * @param withdrawalsProcessor the Withdrawals processor to use
    * @param depositsValidator the withdrawals validator to use
    * @param isPoS indicates whether the current spec is PoS
-   * @param isReplayProtectionSupported indicates whether the current spec supports replay
-   *     protection
    */
   public ProtocolSpec(
       final String name,
       final EVM evm,
-      final TransactionValidator transactionValidator,
+      final MainnetTransactionValidator transactionValidator,
       final MainnetTransactionProcessor transactionProcessor,
       final PrivateTransactionProcessor privateTransactionProcessor,
       final BlockHeaderValidator blockHeaderValidator,
@@ -142,8 +139,7 @@ public class ProtocolSpec {
       final WithdrawalsValidator withdrawalsValidator,
       final Optional<WithdrawalsProcessor> withdrawalsProcessor,
       final DepositsValidator depositsValidator,
-      final boolean isPoS,
-      final boolean isReplayProtectionSupported) {
+      final boolean isPoS) {
     this.name = name;
     this.evm = evm;
     this.transactionValidator = transactionValidator;
@@ -171,7 +167,6 @@ public class ProtocolSpec {
     this.withdrawalsProcessor = withdrawalsProcessor;
     this.depositsValidator = depositsValidator;
     this.isPoS = isPoS;
-    this.isReplayProtectionSupported = isReplayProtectionSupported;
   }
 
   /**
@@ -188,12 +183,12 @@ public class ProtocolSpec {
    *
    * @return the transaction validator
    */
-  public TransactionValidator getTransactionValidator() {
+  public MainnetTransactionValidator getTransactionValidator() {
     return transactionValidator;
   }
 
   public boolean isReplayProtectionSupported() {
-    return isReplayProtectionSupported;
+    return transactionValidator.isReplayProtectionSupported();
   }
 
   /**
