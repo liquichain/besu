@@ -50,7 +50,7 @@ public class TransactionDBRocksDBColumnarKeyValueStorageTest
       final List<SegmentIdentifier> segments,
       final List<SegmentIdentifier> ignorableSegments) {
     return new TransactionDBRocksDBColumnarKeyValueStorage(
-        new RocksDBConfigurationBuilder().databaseDir(folder).build(),
+        new RocksDBConfigurationBuilder().databaseDir(path).build(),
         segments,
         ignorableSegments,
         new NoOpMetricsSystem(),
