@@ -21,19 +21,13 @@ import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcErrorR
 import org.hyperledger.besu.ethereum.api.jsonrpc.internal.response.JsonRpcResponse;
 import org.hyperledger.besu.ethereum.p2p.network.P2PNetwork;
 import org.hyperledger.besu.ethereum.p2p.network.exceptions.P2PDisabledException;
-import org.hyperledger.besu.ethereum.p2p.peers.EnodeDnsConfiguration;
-
-import java.util.Optional;
 
 public abstract class AdminModifyPeer implements JsonRpcMethod {
 
   protected final P2PNetwork peerNetwork;
-  protected final Optional<EnodeDnsConfiguration> enodeDnsConfiguration;
 
-  protected AdminModifyPeer(
-      final P2PNetwork peerNetwork, final Optional<EnodeDnsConfiguration> enodeDnsConfiguration) {
+  protected AdminModifyPeer(final P2PNetwork peerNetwork) {
     this.peerNetwork = peerNetwork;
-    this.enodeDnsConfiguration = enodeDnsConfiguration;
   }
 
   @Override
@@ -55,16 +49,8 @@ public abstract class AdminModifyPeer implements JsonRpcMethod {
         return new JsonRpcErrorResponse(
             requestContext.getRequest().getId(), JsonRpcError.ENODE_ID_INVALID);
       } else {
-        if (e.getMessage().endsWith("Invalid ip address.")) {
-          return new JsonRpcErrorResponse(
-              requestContext.getRequest().getId(), JsonRpcError.DNS_NOT_ENABLED);
-        } else if (e.getMessage().endsWith("dns-update-enabled flag is false.")) {
-          return new JsonRpcErrorResponse(
-              requestContext.getRequest().getId(), JsonRpcError.CANT_RESOLVE_PEER_ENODE_DNS);
-        } else {
-          return new JsonRpcErrorResponse(
-              requestContext.getRequest().getId(), JsonRpcError.PARSE_ERROR);
-        }
+        return new JsonRpcErrorResponse(
+            requestContext.getRequest().getId(), JsonRpcError.PARSE_ERROR);
       }
     } catch (final P2PDisabledException e) {
       return new JsonRpcErrorResponse(

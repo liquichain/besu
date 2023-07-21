@@ -186,7 +186,6 @@ public class WebSocketServiceLoginTest {
                     folder.getRoot().toPath(),
                     mock(EthPeers.class),
                     vertx,
-                    Optional.empty(),
                     Optional.empty()));
 
     websocketMethods.putAll(rpcMethods);
