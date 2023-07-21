@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.hyperledger.besu.plugin.services.storage.KeyValueStorage;
 import org.hyperledger.besu.plugin.services.storage.KeyValueStorageTransaction;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,12 +32,11 @@ import java.util.stream.Stream;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.tuweni.bytes.Bytes;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /** The Abstract key value storage test. */
-@Disabled
+@Ignore
 public abstract class AbstractKeyValueStorageTest {
 
   /**
@@ -354,16 +352,12 @@ public abstract class AbstractKeyValueStorageTest {
    *
    * @throws Exception the exception
    */
-  @Test
+  @Test(expected = IllegalStateException.class)
   public void transactionPutAfterCommit() throws Exception {
-    Assertions.assertThatThrownBy(
-            () -> {
-              final KeyValueStorage store = createStore();
-              final KeyValueStorageTransaction tx = store.startTransaction();
-              tx.commit();
-              tx.put(bytesOf(1), bytesOf(1));
-            })
-        .isInstanceOf(IllegalStateException.class);
+    final KeyValueStorage store = createStore();
+    final KeyValueStorageTransaction tx = store.startTransaction();
+    tx.commit();
+    tx.put(bytesOf(1), bytesOf(1));
   }
 
   /**
@@ -371,16 +365,12 @@ public abstract class AbstractKeyValueStorageTest {
    *
    * @throws Exception the exception
    */
-  @Test
+  @Test(expected = IllegalStateException.class)
   public void transactionRemoveAfterCommit() throws Exception {
-    Assertions.assertThatThrownBy(
-            () -> {
-              final KeyValueStorage store = createStore();
-              final KeyValueStorageTransaction tx = store.startTransaction();
-              tx.commit();
-              tx.remove(bytesOf(1));
-            })
-        .isInstanceOf(IllegalStateException.class);
+    final KeyValueStorage store = createStore();
+    final KeyValueStorageTransaction tx = store.startTransaction();
+    tx.commit();
+    tx.remove(bytesOf(1));
   }
 
   /**
@@ -388,16 +378,12 @@ public abstract class AbstractKeyValueStorageTest {
    *
    * @throws Exception the exception
    */
-  @Test
+  @Test(expected = IllegalStateException.class)
   public void transactionPutAfterRollback() throws Exception {
-    Assertions.assertThatThrownBy(
-            () -> {
-              final KeyValueStorage store = createStore();
-              final KeyValueStorageTransaction tx = store.startTransaction();
-              tx.rollback();
-              tx.put(bytesOf(1), bytesOf(1));
-            })
-        .isInstanceOf(IllegalStateException.class);
+    final KeyValueStorage store = createStore();
+    final KeyValueStorageTransaction tx = store.startTransaction();
+    tx.rollback();
+    tx.put(bytesOf(1), bytesOf(1));
   }
 
   /**
@@ -405,16 +391,12 @@ public abstract class AbstractKeyValueStorageTest {
    *
    * @throws Exception the exception
    */
-  @Test
+  @Test(expected = IllegalStateException.class)
   public void transactionRemoveAfterRollback() throws Exception {
-    Assertions.assertThatThrownBy(
-            () -> {
-              final KeyValueStorage store = createStore();
-              final KeyValueStorageTransaction tx = store.startTransaction();
-              tx.rollback();
-              tx.remove(bytesOf(1));
-            })
-        .isInstanceOf(IllegalStateException.class);
+    final KeyValueStorage store = createStore();
+    final KeyValueStorageTransaction tx = store.startTransaction();
+    tx.rollback();
+    tx.remove(bytesOf(1));
   }
 
   /**
@@ -422,16 +404,12 @@ public abstract class AbstractKeyValueStorageTest {
    *
    * @throws Exception the exception
    */
-  @Test
+  @Test(expected = IllegalStateException.class)
   public void transactionCommitAfterRollback() throws Exception {
-    Assertions.assertThatThrownBy(
-            () -> {
-              final KeyValueStorage store = createStore();
-              final KeyValueStorageTransaction tx = store.startTransaction();
-              tx.rollback();
-              tx.commit();
-            })
-        .isInstanceOf(IllegalStateException.class);
+    final KeyValueStorage store = createStore();
+    final KeyValueStorageTransaction tx = store.startTransaction();
+    tx.rollback();
+    tx.commit();
   }
 
   /**
@@ -439,16 +417,12 @@ public abstract class AbstractKeyValueStorageTest {
    *
    * @throws Exception the exception
    */
-  @Test
+  @Test(expected = IllegalStateException.class)
   public void transactionCommitTwice() throws Exception {
-    Assertions.assertThatThrownBy(
-            () -> {
-              final KeyValueStorage store = createStore();
-              final KeyValueStorageTransaction tx = store.startTransaction();
-              tx.commit();
-              tx.commit();
-            })
-        .isInstanceOf(IllegalStateException.class);
+    final KeyValueStorage store = createStore();
+    final KeyValueStorageTransaction tx = store.startTransaction();
+    tx.commit();
+    tx.commit();
   }
 
   /**
@@ -456,16 +430,12 @@ public abstract class AbstractKeyValueStorageTest {
    *
    * @throws Exception the exception
    */
-  @Test
+  @Test(expected = IllegalStateException.class)
   public void transactionRollbackAfterCommit() throws Exception {
-    Assertions.assertThatThrownBy(
-            () -> {
-              final KeyValueStorage store = createStore();
-              final KeyValueStorageTransaction tx = store.startTransaction();
-              tx.commit();
-              tx.rollback();
-            })
-        .isInstanceOf(IllegalStateException.class);
+    final KeyValueStorage store = createStore();
+    final KeyValueStorageTransaction tx = store.startTransaction();
+    tx.commit();
+    tx.rollback();
   }
 
   /**
@@ -473,16 +443,12 @@ public abstract class AbstractKeyValueStorageTest {
    *
    * @throws Exception the exception
    */
-  @Test
+  @Test(expected = IllegalStateException.class)
   public void transactionRollbackTwice() throws Exception {
-    Assertions.assertThatThrownBy(
-            () -> {
-              final KeyValueStorage store = createStore();
-              final KeyValueStorageTransaction tx = store.startTransaction();
-              tx.rollback();
-              tx.rollback();
-            })
-        .isInstanceOf(IllegalStateException.class);
+    final KeyValueStorage store = createStore();
+    final KeyValueStorageTransaction tx = store.startTransaction();
+    tx.rollback();
+    tx.rollback();
   }
 
   /**
@@ -580,16 +546,5 @@ public abstract class AbstractKeyValueStorageTest {
    */
   protected byte[] bytesOf(final int... bytes) {
     return Bytes.of(bytes).toArrayUnsafe();
-  }
-
-  /**
-   * Create a sub folder from the given path, that will not conflict with other folders.
-   *
-   * @param folder the folder in which to create the sub folder
-   * @return the path representing the sub folder
-   * @throws Exception if the folder cannot be created
-   */
-  protected Path getTempSubFolder(final Path folder) throws Exception {
-    return java.nio.file.Files.createTempDirectory(folder, null);
   }
 }

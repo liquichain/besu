@@ -35,24 +35,24 @@ import org.hyperledger.besu.plugin.services.storage.rocksdb.configuration.RocksD
 import org.hyperledger.besu.plugin.services.storage.rocksdb.configuration.RocksDBConfigurationBuilder;
 import org.hyperledger.besu.plugin.services.storage.rocksdb.unsegmented.RocksDBKeyValueStorage;
 
-import java.nio.file.Path;
 import java.util.function.LongSupplier;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.io.TempDir;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class RocksDBKeyValueStorageTest extends AbstractKeyValueStorageTest {
 
   @Mock private ObservableMetricsSystem metricsSystemMock;
   @Mock private LabelledMetric<OperationTimer> labelledMetricOperationTimerMock;
   @Mock private LabelledMetric<Counter> labelledMetricCounterMock;
   @Mock private OperationTimer operationTimerMock;
-  @TempDir static Path folder;
+  @Rule public final TemporaryFolder folder = new TemporaryFolder();
 
   @Override
   protected KeyValueStorage createStore() throws Exception {
@@ -131,6 +131,6 @@ public class RocksDBKeyValueStorageTest extends AbstractKeyValueStorageTest {
   }
 
   private RocksDBConfiguration config() throws Exception {
-    return new RocksDBConfigurationBuilder().databaseDir(getTempSubFolder(folder)).build();
+    return new RocksDBConfigurationBuilder().databaseDir(folder.newFolder().toPath()).build();
   }
 }

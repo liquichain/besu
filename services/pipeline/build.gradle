@@ -37,9 +37,11 @@ dependencies {
   implementation 'io.opentelemetry:opentelemetry-api'
   implementation 'com.google.guava:guava'
 
+  testImplementation 'junit:junit'
   testImplementation 'org.assertj:assertj-core'
   testImplementation 'org.awaitility:awaitility'
   testImplementation 'org.junit.jupiter:junit-jupiter'
   testImplementation 'org.mockito:mockito-core'
-  testImplementation 'org.mockito:mockito-junit-jupiter'
+
+  testRuntimeOnly 'org.junit.vintage:junit-vintage-engine'
 }

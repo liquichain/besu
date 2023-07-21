@@ -16,7 +16,7 @@ package org.hyperledger.besu.services.pipeline;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hyperledger.besu.metrics.noop.NoOpMetricsSystem.NO_OP_COUNTER;
-import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -24,13 +24,13 @@ import static org.mockito.Mockito.when;
 
 import java.util.Locale;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@ExtendWith(MockitoExtension.class)
+@RunWith(MockitoJUnitRunner.class)
 public class ProcessingStageTest {
 
   private final Pipe<String> inputPipe =
@@ -40,11 +40,10 @@ public class ProcessingStageTest {
   @Mock private Processor<String, String> singleStep;
   private ProcessingStage<String, String> stage;
 
-  @BeforeEach
+  @Before
   public void setUp() {
     stage = new ProcessingStage<>("name", inputPipe, outputPipe, singleStep);
-    lenient()
-        .doAnswer(
+    doAnswer(
             invocation -> {
               outputPipe.put(inputPipe.get().toLowerCase(Locale.UK));
               return 1;

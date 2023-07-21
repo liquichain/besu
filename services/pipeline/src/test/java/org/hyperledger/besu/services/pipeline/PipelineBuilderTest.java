@@ -51,8 +51,8 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
+import org.junit.After;
+import org.junit.Test;
 
 public class PipelineBuilderTest {
 
@@ -66,7 +66,7 @@ public class PipelineBuilderTest {
 
   private final ExecutorService executorService = Executors.newCachedThreadPool(THREAD_FACTORY);
 
-  @AfterEach
+  @After
   public void afterClass() throws Exception {
     executorService.shutdownNow();
     if (!executorService.awaitTermination(10, SECONDS)) {

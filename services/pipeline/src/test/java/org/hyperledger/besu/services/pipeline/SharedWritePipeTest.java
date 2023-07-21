@@ -18,7 +18,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class SharedWritePipeTest {
 

@@ -23,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.function.Function;
 
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class MapProcessorTest {
 
