@@ -14,6 +14,7 @@
  */
 package org.hyperledger.besu.evm;
 
+import org.hyperledger.besu.evm.gascalculator.BerlinGasCalculator;
 import org.hyperledger.besu.evm.gascalculator.ByzantiumGasCalculator;
 import org.hyperledger.besu.evm.gascalculator.CancunGasCalculator;
 import org.hyperledger.besu.evm.gascalculator.ConstantinopleGasCalculator;
@@ -546,26 +547,7 @@ public class MainnetEVMs {
    * @return the evm
    */
   public static EVM berlin(final BigInteger chainId, final EvmConfiguration evmConfiguration) {
-    return berlin(new IstanbulGasCalculator(), chainId, evmConfiguration);
-  }
-
-  /**
-   * Berlin evm.
-   *
-   * @param gasCalculator the gas calculator
-   * @param chainId the chain id
-   * @param evmConfiguration the evm configuration
-   * @return the evm
-   */
-  public static EVM berlin(
-      final GasCalculator gasCalculator,
-      final BigInteger chainId,
-      final EvmConfiguration evmConfiguration) {
-    return new EVM(
-        istanbulOperations(gasCalculator, chainId),
-        gasCalculator,
-        evmConfiguration,
-        EvmSpecVersion.BERLIN);
+    return istanbul(new BerlinGasCalculator(), chainId, evmConfiguration);
   }
 
   /**
