@@ -55,6 +55,7 @@ public class BackwardSyncContext {
   private final AtomicReference<Status> currentBackwardSyncStatus = new AtomicReference<>();
   private final BackwardChain backwardChain;
   private int batchSize = BATCH_SIZE;
+  private Optional<Hash> maybeHead = Optional.empty();
   private final int maxRetries;
   private final long millisBetweenRetries = DEFAULT_MILLIS_BETWEEN_RETRIES;
   private final Subscribers<BadChainListener> badChainListeners = Subscribers.create();
@@ -100,21 +101,17 @@ public class BackwardSyncContext {
         .orElse(Boolean.FALSE);
   }
 
-  public synchronized void maybeUpdateTargetHeight(final Hash headHash) {
-    if (!Hash.ZERO.equals(headHash)) {
+  public synchronized void updateHead(final Hash headHash) {
+    if (Hash.ZERO.equals(headHash)) {
+      maybeHead = Optional.empty();
+    } else {
+      maybeHead = Optional.of(headHash);
       Optional<Status> maybeCurrentStatus = Optional.ofNullable(currentBackwardSyncStatus.get());
       maybeCurrentStatus.ifPresent(
           status ->
               backwardChain
                   .getBlock(headHash)
-                  .ifPresent(
-                      block -> {
-                        LOG.atTrace()
-                            .setMessage("updateTargetHeight to {}")
-                            .addArgument(block::toLogString)
-                            .log();
-                        status.updateTargetHeight(block.getHeader().getNumber());
-                      }));
+                  .ifPresent(block -> status.updateTargetHeight(block.getHeader().getNumber())));
     }
   }
 
@@ -334,12 +331,20 @@ public class BackwardSyncContext {
   @VisibleForTesting
   protected void possiblyMoveHead(final Block lastSavedBlock) {
     final MutableBlockchain blockchain = getProtocolContext().getBlockchain();
+    if (maybeHead.isEmpty()) {
+      LOG.debug("Nothing to do with the head");
+      return;
+    }
 
-    if (blockchain.getChainHead().getHash().equals(lastSavedBlock.getHash())) {
-      LOG.atDebug()
-          .setMessage("Head is already properly set to {}")
-          .addArgument(lastSavedBlock::toLogString)
-          .log();
+    final Hash head = maybeHead.get();
+    if (blockchain.getChainHead().getHash().equals(head)) {
+      LOG.debug("Head is already properly set");
+      return;
+    }
+
+    if (blockchain.contains(head)) {
+      LOG.debug("Changing head to {}", head);
+      blockchain.rewindToBlock(head);
       return;
     }
 
@@ -435,6 +440,10 @@ public class BackwardSyncContext {
         return true;
       }
       return false;
+    }
+
+    public CompletableFuture<Void> getCurrentFuture() {
+      return currentFuture;
     }
 
     public long getTargetChainHeight() {

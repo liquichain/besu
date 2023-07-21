@@ -92,8 +92,8 @@ public class RetryingGetHeadersEndingAtFromPeerByHashTask
     return executeSubTask(task::run)
         .thenApply(
             peerResult -> {
-              LOG.trace(
-                  "Got {} block headers by hash {} from peer {} has result {}",
+              LOG.debug(
+                  "Get {} block headers by hash {} from peer {} has result {}",
                   count,
                   referenceHash,
                   currentPeer,
